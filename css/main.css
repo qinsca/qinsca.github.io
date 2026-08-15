@@ -26,45 +26,6 @@
   --highlight-gutter-foreground: #171717;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --body-bg-color: #282828;
-    --content-bg-color: #333;
-    --card-bg-color: #555;
-    --text-color: #ccc;
-    --selection-bg: #bbb;
-    --selection-color: #333;
-    --blockquote-color: #bbb;
-    --link-color: #ccc;
-    --link-hover-color: #eee;
-    --brand-color: #ddd;
-    --brand-hover-color: #ddd;
-    --table-row-odd-bg-color: #282828;
-    --table-row-hover-bg-color: #363636;
-    --menu-item-bg-color: #555;
-    --theme-color: #222;
-    --btn-default-bg: #222;
-    --btn-default-color: #ccc;
-    --btn-default-border-color: #555;
-    --btn-default-hover-bg: #666;
-    --btn-default-hover-color: #ccc;
-    --btn-default-hover-border-color: #666;
-    --highlight-background: #eee;
-    --highlight-foreground: #000;
-    --highlight-gutter-background: #d6d6d6;
-    --highlight-gutter-foreground: #171717;
-    color-scheme: dark;
-  }
-  img {
-    opacity: 0.75;
-  }
-  img:hover {
-    opacity: 0.9;
-  }
-  iframe {
-    color-scheme: light;
-  }
-}
 html {
   line-height: 1.15; /* 1 */
   -webkit-text-size-adjust: 100%; /* 2 */
@@ -1223,7 +1184,7 @@ pre code {
     vertical-align: middle;
   }
   .links-of-author a::before {
-    background: #004e85;
+    background: #ff9501;
     display: inline-block;
     margin-right: 3px;
     transform: translateY(-2px);
@@ -2369,52 +2330,6 @@ ul.breadcrumb li:last-child {
   border-bottom-color: #111;
   color: #111;
 }
-@media (prefers-color-scheme: dark) {
-  .tag-cloud-0 {
-    border-bottom-color: #555;
-    color: #555;
-  }
-  .tag-cloud-1 {
-    border-bottom-color: #646464;
-    color: #646464;
-  }
-  .tag-cloud-2 {
-    border-bottom-color: #737373;
-    color: #737373;
-  }
-  .tag-cloud-3 {
-    border-bottom-color: #828282;
-    color: #828282;
-  }
-  .tag-cloud-4 {
-    border-bottom-color: #929292;
-    color: #929292;
-  }
-  .tag-cloud-5 {
-    border-bottom-color: #a1a1a1;
-    color: #a1a1a1;
-  }
-  .tag-cloud-6 {
-    border-bottom-color: #b0b0b0;
-    color: #b0b0b0;
-  }
-  .tag-cloud-7 {
-    border-bottom-color: #c0c0c0;
-    color: #c0c0c0;
-  }
-  .tag-cloud-8 {
-    border-bottom-color: #cfcfcf;
-    color: #cfcfcf;
-  }
-  .tag-cloud-9 {
-    border-bottom-color: #dedede;
-    color: #dedede;
-  }
-  .tag-cloud-10 {
-    border-bottom-color: #eee;
-    color: #eee;
-  }
-}
 .search-active {
   overflow: hidden;
   margin-right: var(--dialog-scrollgutter, 0);
@@ -2472,11 +2387,6 @@ ul.breadcrumb li:last-child {
   border-top-right-radius: 5px;
   display: flex;
   padding: 5px;
-}
-@media (prefers-color-scheme: dark) {
-  .search-popup .search-header {
-    background: #666;
-  }
 }
 .search-popup input.search-input {
   background: transparent;
@@ -2872,18 +2782,6 @@ header.header {
 }
 /* ====== 🌙 夜间模式 (重点修复层次感) ====== */
 /* 1. 系统设置 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ak-bg: #0a0a0a; /* L1: 背景极深 (接近纯黑) */
-    --ak-sidebar-bg: #161616; /* L2: 侧边栏 (深灰) */
-    --ak-card-bg: #202020; /* L3: 文章卡片 (提亮灰，形成对比) */
-    --ak-decorat: #23ade5;
-    --ak-text-main: #fff;
-    --ak-text-sec: #a0a0a0;
-    --ak-border-color: #333;
-    --ak-shadow: 0 10px 30px rgba(0,0,0,0.8); /* 夜间强投影，拉开层次 */
-  }
-}
 /* 2. 手动开关 */
 body.dark-mode,
 body.darkmode--activated,
@@ -3044,16 +2942,6 @@ body {
 .highlight {
   background: #f9f9f9;
   border: 1px solid var(--ak-border-color);
-}
-@media (prefers-color-scheme: dark) {
-  .highlight {
-    background: #000 !important;
-    border-left: 4px solid var(--ak-yellow);
-  }
-  .highlight figcaption {
-    background: #111;
-    color: #ccc;
-  }
 }
 body.dark-mode .highlight,
 html[data-theme='dark'] .highlight {
