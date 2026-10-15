@@ -1,0 +1,470 @@
+/* =========================================================================
+   hexo-theme-arknights 魔改样式
+   1) 侧边栏罗德岛图标 → 我的头像（圆形 + 状态光晕）
+   2) 夜间/日间模式切换按钮的强化（图标旋转、键盘可达、模式提示、过渡动画）
+   3) 图片灯箱与评论区的细节修补
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ */
+/* 1. 头像（替换罗德岛图标）                                            */
+/* ------------------------------------------------------------------ */
+#logo {
+  display: block;
+  width: 8rem;
+  height: 8rem;
+  /* 主题默认 margin-bottom: 100%（按侧边栏宽度撑开），换成固定间距 */
+  margin: 0 auto 1.1rem;
+  position: relative;
+  border-radius: 50%;
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.3, 1), filter 0.4s;
+}
+
+#logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--theme-highlight);
+  background-color: var(--theme-bg-soft);
+  box-sizing: border-box;
+  transition: border-color 0.4s, box-shadow 0.4s, transform 0.4s;
+}
+
+/* 头像外圈：罗德岛终端风格的呼吸光环 */
+#logo::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  border: 1px dashed var(--theme-highlight);
+  opacity: 0.55;
+  transition: opacity 0.4s, transform 0.6s;
+  pointer-events: none;
+}
+
+@media (min-width: 769px) {
+  #logo:hover {
+    transform: scale(1.04);
+    filter: drop-shadow(0 0 10px var(--theme-highlight));
+  }
+
+  #logo:hover img {
+    border-color: var(--theme-subcolor);
+  }
+
+  #logo:hover::after {
+    opacity: 1;
+    transform: rotate(180deg);
+  }
+}
+
+/* 小屏时头像别太大，给正文留空间 */
+@media (max-width: 768px) {
+  #logo {
+    width: 6rem;
+    height: 6rem;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. 明暗模式切换按钮                                                 */
+/* ------------------------------------------------------------------ */
+.i-color {
+  cursor: pointer;
+}
+
+/* 主题把小按钮放在 `position: sticky` 的容器里，桌面端滚长文时可能滑出视口，
+   这里在小屏（主题原本就是 fixed）之外也固定到视口右下角。 */
+@media (min-width: 769px) {
+  .bottom-btn {
+    position: fixed;
+    inset: auto 0 0 auto;
+    width: 0;
+    height: 0;
+  }
+
+  /* 固定后不再占据文档流，给正文留出底部空间，避免遮住最后一行 */
+  #post-bg {
+    padding-bottom: 72px;
+  }
+}
+
+/* 键盘聚焦时给出可见轮廓（无障碍） */
+.i-color:focus-visible,
+#to-top:focus-visible,
+#to-index:focus-visible {
+  outline: 2px solid var(--theme-highlight);
+  outline-offset: 2px;
+}
+
+/* 切换瞬间让整页颜色/背景平滑过渡，避免闪一下 */
+html.ak-theme-changing,
+html.ak-theme-changing body,
+html.ak-theme-changing * {
+  transition: background-color 0.45s ease, color 0.45s ease,
+    border-color 0.45s ease, fill 0.45s ease !important;
+}
+
+/* 按下时轻微回弹，给出触感反馈（旋转仍由主题的 ::after 规则负责） */
+.i-color:active {
+  transform: scale(0.92);
+}
+
+/* 模式徽标（JS 注入）：鼠标悬停时在按钮左侧显示当前模式 */
+.ak-mode-badge {
+  position: absolute;
+  right: 48px;
+  bottom: 8px;
+  height: 24px;
+  line-height: 24px;
+  padding: 0 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  color: var(--theme-text-light);
+  background-color: var(--theme-bg-trans1);
+  border: 1px solid var(--theme-border-soft);
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+
+.i-color:hover + .ak-mode-badge,
+.i-color:focus-visible + .ak-mode-badge {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 按钮图标：夜间更亮，日间更稳 */
+:root[theme-mode='dark'] .i-color::after {
+  filter: drop-shadow(0 0 4px var(--theme-highlight));
+}
+
+:root[theme-mode='light'] .i-color::after {
+  filter: none;
+}
+
+/* 首页卡片摘要：摘要里若包含标题/表格/代码块，需要压缩一下，避免卡片过高 */
+.recent-excerpt {
+  max-height: 12em;
+  overflow: hidden;
+}
+
+.recent-excerpt::after {
+  content: '';
+  display: block;
+  height: 2em;
+  margin-top: -2em;
+  position: relative;
+  background: linear-gradient(to bottom, transparent, var(--theme-bg-trans1));
+  pointer-events: none;
+}
+
+.recent-excerpt h1,
+.recent-excerpt h2,
+.recent-excerpt h3,
+.recent-excerpt h4 {
+  font-size: 1em;
+  font-weight: 700;
+  padding: 0.2em 0;
+  margin: 0.2em 0;
+}
+
+.recent-excerpt pre,
+.recent-excerpt .highlight,
+.recent-excerpt figure {
+  display: none;
+}
+
+.recent-excerpt table {
+  font-size: 0.8em;
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. 明暗配色：完全沿用主题原始色板                                    */
+/* ------------------------------------------------------------------ */
+/* 这里【刻意不再覆盖】任何 --theme-* 颜色变量。
+   主题自带两套色板（source/css/_core/color/light.styl 与 dark.styl）：
+
+     白天  --theme-background #f4f5f6 / 面板 rgba(#f4f5f6,.8) / 正文 #222
+     夜间  --theme-background #141516 / 面板 rgba(#141516,.8) / 正文 #c4c4c4
+
+   主题的白天设计本来就是「深色背景图（source/img/bg.jpg，mean luma ≈ 31）
+   + 浅色面板」，靠背景与面板的强对比出效果，而不是靠整体提亮。
+   之前自己按"白天该亮"的直觉重做了色板并提亮背景图，反而破坏了这层对比，
+   导致"太白了不好看"。所以背景图也换回主题自带的那两张。
+
+   唯一保留的是首页卡片的一层细边，方便在背景上分辨面板边界。 */
+.recent-post {
+  border-color: var(--theme-border-soft);
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. 左侧导航的选中光标                                               */
+/* ------------------------------------------------------------------ */
+/* 主题其实已经做好了一大半：Header.relabel()（source/js/arknights.js）
+   会自动给当前页面对应的 .navItem 加 .active，header.styl 里也有
+   `.active > .navBlock > .navItemTitle` 的规则。
+
+   但那条规则不可用：::before 只写了 display/position/left/border-color，
+   没有 width / height / background，被 flex_layout.styl 的 `height 100%`
+   撑成满高、宽度仍为 0 —— 光标画不出来（和 --theme-light 一样，
+   属于主题"写了一半"的样式；实测编译产物里这条规则也没保留下来）。
+
+   所以这里完整补一条，用元素+类选择器提高可靠性，不依赖主题那条。 */
+
+.navContent li.navItem.active > a.navBlock > span.navItemTitle,
+.navContent li.navItem.active > div.navBlock > span.navItemTitle {
+  color: var(--theme-highlight);
+}
+
+.navContent li.navItem.active > a.navBlock > span.navItemTitle::before,
+.navContent li.navItem.active > div.navBlock > span.navItemTitle::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 1.1em;
+  background-color: var(--theme-highlight);
+  border: none;
+  box-shadow: 0 0 8px var(--theme-highlight);
+}
+
+/* 桌面端：给光标留出位置 */
+@media (min-width: 1024px) {
+  .navContent li.navItem > a.navBlock > span.navItemTitle,
+  .navContent li.navItem > div.navBlock > span.navItemTitle {
+    padding-left: 10px;
+    box-sizing: border-box;
+  }
+}
+
+/* 移动端菜单是纵向列表：改成整行左侧竖条，并去掉桌面那个小光标 */
+@media (max-width: 1023px) {
+  .navContent li.navItem > a.navBlock,
+  .navContent li.navItem > div.navBlock {
+    position: relative;
+  }
+
+  .navContent li.navItem > a.navBlock::before,
+  .navContent li.navItem > div.navBlock::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background-color: transparent;
+    transition: background-color 0.3s;
+    pointer-events: none;
+  }
+
+  .navContent li.navItem.active > a.navBlock::before,
+  .navContent li.navItem.active > div.navBlock::before {
+    background-color: var(--theme-highlight);
+    box-shadow: 0 0 8px var(--theme-highlight);
+  }
+
+  .navContent li.navItem.active > a.navBlock > span.navItemTitle::before,
+  .navContent li.navItem.active > div.navBlock > span.navItemTitle::before {
+    content: none;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 5. 正文排版：加粗 / 斜体 / 行内代码                                 */
+/* ------------------------------------------------------------------ */
+/* 主题 bug：base.styl 里写的是 var(--theme-light)，但这个变量从来不存在，
+   应该是 --theme-text-light。结果正文里的 **加粗** 既不换色也不加粗，很没存在感。
+   这里补上：加粗用亮色 + 更重的字重，中文也用系统黑体加粗字形。 */
+#post-content strong,
+#post-content b,
+.recent-excerpt strong {
+  color: var(--theme-text-light);
+  font-weight: 800;
+  font-family: 'JetBrains Mono', 'Microsoft YaHei', 'PingFang SC',
+    'Hiragino Sans GB', 'Source Han Sans SC', sans-serif;
+}
+
+/* 加粗的关键词给一点底色，扫读时更醒目（不要影响链接里的加粗） */
+#post-content p > strong:only-child,
+#post-content li > strong:first-child {
+  letter-spacing: 0.02em;
+}
+
+#post-content em,
+#post-content i {
+  color: var(--theme-text-light);
+  font-style: italic;
+}
+
+#post-content strong em,
+#post-content em strong {
+  color: var(--theme-stress);
+}
+
+/* 行内代码：主题 base.styl 给 code 设了 --theme-bg-soft-hover 背景，
+   这里把边框和圆角补上，和块级代码块区分开 */
+#post-content p code,
+#post-content li code,
+#post-content td code,
+#post-content blockquote code,
+.recent-excerpt code {
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 3px;
+  padding: 0 5px !important;
+  font-size: 0.92em;
+  word-break: break-word;
+}
+
+/* 兜底：万一还有没被升级成 .highlight 的裸 <pre>（比如插件生成的），
+   也给它代码块的样子，不要变成看不出边界的纯文本 */
+#post-content > pre,
+.lg-container pre {
+  background-color: var(--theme-bg-soft);
+  border: 1px solid var(--theme-border-soft);
+  border-left: 3px solid var(--theme-highlight);
+  padding: 10px 12px;
+  overflow-x: auto;
+}
+
+#post-content > pre code {
+  background: transparent !important;
+  border: none;
+}
+
+/* 代码块：行号不被选中、长行可横向滚动 */
+.highlight .gutter {
+  user-select: none;
+}
+
+.highlight table {
+  border-collapse: collapse;
+}
+
+.highlight td.code pre {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.highlight td.code {
+  max-width: 100%;
+}
+
+/* ------------------------------------------------------------------ */
+/* 6. 标签 / 分类总览页                                                */
+/* ------------------------------------------------------------------ */
+/* 主题自带 #Archives / #Categories / #Tags 的卡片外观，
+   这里在上面加一层标签云：卡片 + 计数徽标，明暗两套都用主题变量。 */
+
+#ak-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-content: flex-start;
+  padding: 0 0 60px;
+}
+
+/* 条目数提示行 */
+.ak-terms-hint {
+  margin: 0 0 14px;
+  padding-left: 10px;
+  border-left: 3px solid var(--theme-subcolor);
+  color: var(--theme-unimportant);
+  font-size: 0.9em;
+  letter-spacing: 0.02em;
+}
+
+.ak-term {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--theme-border-soft);
+  border-left: 3px solid var(--theme-highlight);
+  background-color: var(--theme-bg-soft);
+  transition: transform 0.25s, background-color 0.25s, border-color 0.25s;
+}
+
+.ak-term:hover {
+  transform: translateY(-2px);
+  border-left-color: var(--theme-subcolor);
+  background-color: var(--theme-bg-soft-hover);
+}
+
+.ak-term-title {
+  padding: 5px 12px;
+  font-family: 'JetBrains Mono', 'Microsoft YaHei', sans-serif;
+  color: var(--theme-text-light);
+  white-space: nowrap;
+}
+
+.ak-term-count {
+  display: inline-block;
+  min-width: 22px;
+  padding: 3px 7px;
+  margin-right: 4px;
+  text-align: center;
+  font-family: BenderLight, sans-serif;
+  font-size: 0.86em;
+  color: var(--theme-background);
+  background-color: var(--theme-highlight);
+  transition: background-color 0.25s;
+}
+
+.ak-term:hover .ak-term-count {
+  background-color: var(--theme-subcolor);
+  color: var(--theme-text-hover);
+}
+
+/* 总览页的标题外框与 #Archives 保持一致 */
+#Archives > h1 {
+  font-size: medium;
+}
+
+@media (max-width: 768px) {
+  #ak-tag-cloud {
+    gap: 8px;
+  }
+
+  .ak-term-title {
+    padding: 4px 10px;
+    font-size: 0.95em;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 7. 细节修补                                                         */
+/* ------------------------------------------------------------------ */
+/* 灯箱包裹层：不要把图片挤成行内元素 */
+#post-content a.item-img {
+  display: inline-block;
+  padding: 0;
+  line-height: 0;
+}
+
+#post-content a.item-img img {
+  max-width: 100%;
+}
+
+/* 文章正文图片圆角与描边，跟卡片风格一致 */
+#post-content img {
+  border: 1px solid var(--theme-border-soft);
+  border-radius: 2px;
+}
+
+/* Giscus 评论区跟随明暗模式 */
+#giscus {
+  margin-top: 1.2em;
+  color-scheme: light dark;
+}
+
+/* 标签/分类页的小屏适配 */
+@media (max-width: 768px) {
+  .ak-mode-badge {
+    display: none;
+  }
+}

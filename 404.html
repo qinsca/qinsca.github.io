@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh" theme-mode="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>エラー発生。</title>
+  <link rel="icon" type="image/png" href="/images/qsc-favicon-32.png" />
+  <style>
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: local('JetBrains Mono'), url('/font/JetBrainsMono-Regular.woff2') format('woff2');
+    }
+
+    :root[theme-mode='dark'] {
+      --bg-color: #141516;
+      --page-bg: url('/images/ak/bk-dark.jpg');
+      --text-color: #fff;
+      --link-color: #2bf;
+      --title-color: #fe2;
+      --logo-opacity: 1;
+    }
+
+    :root[theme-mode='light'] {
+      --bg-color: #f4f5f6;
+      --page-bg: url('/images/ak/bk-light.jpg');
+      --text-color: #222;
+      --link-color: #1a7fbf;
+      --title-color: #d99b00;
+      --logo-opacity: 1;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+      background-image: var(--page-bg);
+      transition: background-color .4s, color .4s;
+    }
+
+    main {
+      text-align: center;
+    }
+
+    #logo {
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    #logo img {
+      width: 300px;
+      border-radius: 50%;
+      opacity: var(--logo-opacity);
+    }
+
+    #error {
+      vertical-align: middle;
+      display: inline-block;
+    }
+
+    #error a {
+      color: var(--link-color);
+      padding: 3px 10px;
+      font-size: larger;
+      text-decoration: none;
+    }
+
+    #error a:hover {
+      color: #000;
+      background-color: var(--link-color);
+    }
+
+    h1 {
+      font-size: 60px;
+      color: var(--title-color);
+    }
+
+    h2 {
+      font-size: 32px;
+      font-family: "JetBrains Mono";
+    }
+
+    @media (max-width: 768px) {
+      #logo img {
+        width: auto;
+        height: 380px;
+        opacity: .23;
+        position: fixed;
+        bottom: -30px;
+        left: -38%;
+        pointer-events: none;
+      }
+    }
+  </style>
+  <script>
+    /* 与全站一致的明暗模式初始化：记住用户选择，否则跟随系统 */
+    (function () {
+      var doc = document.documentElement;
+      try {
+        var saved = window.localStorage.getItem('theme-mode');
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        doc.setAttribute('theme-mode', (saved === 'light' || saved === 'dark') ? saved : (media.matches ? 'dark' : 'light'));
+      } catch (e) {
+        doc.setAttribute('theme-mode', 'dark');
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <main>
+    <a id="logo" href="/">
+      <!-- 罗德岛图标 → 我的头像 -->
+      <img src="/images/qsc-avatar.png" alt="to home" />
+    </a>
+    <div id="error">
+      <h1>エラー発生。</h1>
+      <h2 style="text-align: left;">404 NOT FOUND</h2>
+      <p style="text-align: left;">
+        <a href="/">首页</a>
+        <a onClick="history.back();">上一页</a>
+      </p>
+    </div>
+  </main>
+
+</body>
+
+</html>
