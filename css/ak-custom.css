@@ -58,11 +58,36 @@
   }
 }
 
-/* 小屏时头像别太大，给正文留空间 */
+/* 小屏（<=768px）：主题原本把 #logo img 变成"固定定位的角落水印"
+   （position: fixed; bottom: -50px; left: -46%; opacity: .05），
+   那是为了拿罗德岛徽标当背景装饰；换成真人头像后只会变成一块飘在背景上的
+   半透明鬼影。这里整体取消，恢复成正常的居中小头像。
+   选择器带上 .sidebar/aside 前缀把权重抬到 (1,1,1)，确保压过主题的
+   `@media (max-width:768px) #logo` / `#logo img` 规则。 */
 @media (max-width: 768px) {
   #logo {
-    width: 6rem;
-    height: 6rem;
+    width: 5.5rem;
+    height: 5.5rem;
+    /* 主题在移动端写的是 height: 0; margin: 0 */
+    margin: 0 auto 0.9rem;
+    position: relative;
+    display: block;
+  }
+
+  #logo img {
+    position: static !important;
+    opacity: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    bottom: auto;
+    left: auto;
+    pointer-events: auto;
+    transform: none !important;
+  }
+
+  #logo::after {
+    inset: -5px;
+    opacity: 0.5;
   }
 }
 

@@ -90,14 +90,14 @@
     }
 
     @media (max-width: 768px) {
+      /* 头像不做固定定位的角落大水印（那是原来放罗德岛徽标时的做法），
+         改成缩小后正常排在标题上方 */
       #logo img {
-        width: auto;
-        height: 380px;
-        opacity: .23;
-        position: fixed;
-        bottom: -30px;
-        left: -38%;
-        pointer-events: none;
+        width: 140px;
+        height: 140px;
+        opacity: .92;
+        position: static;
+        margin-bottom: 8px;
       }
     }
   </style>
