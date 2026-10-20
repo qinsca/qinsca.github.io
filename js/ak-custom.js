@@ -157,8 +157,13 @@
 
      由于无法穿透 iframe，改成覆盖层：指针在评论区上方时隐藏原生光标，
      在指针位置画同款像素光标（样式见 ak-custom.css 第 7 节）。
+
+     判断方式用【坐标】而不是 event.target：
+     iframe 由 giscus 异步注入，尺寸往往小于 #giscus 容器，用 target
+     判断会在容器边缘的几像素上误判为"已离开"，导致光标一闪一闪。
      ================================================================== */
   var iframeCursor = null;
+  var CURSOR_ZONE = '#giscus, #utterances, .giscus, .giscus-frame, #comments iframe';
 
   function ensureCursorLayer() {
     if (iframeCursor && iframeCursor.isConnected) return iframeCursor;
@@ -168,17 +173,18 @@
     return iframeCursor;
   }
 
-  function isOverCommentFrame(el) {
-    if (!el) return false;
-    var frame = el.closest
-      ? el.closest('iframe, #giscus, #utterances')
-      : null;
-    if (!frame) return false;
-    return !!(
-      frame.closest('#giscus, #utterances, #comments') ||
-      frame.classList.contains('giscus-frame') ||
-      frame.classList.contains('utterances-frame')
-    );
+  /** 指针是否落在任一评论区的外接矩形内 */
+  function overCommentZone(x, y) {
+    var nodes = document.querySelectorAll(CURSOR_ZONE);
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!el || !el.getBoundingClientRect) continue;
+      var r = el.getBoundingClientRect();
+      // 只认有实际尺寸的元素
+      if (r.width < 8 || r.height < 8) continue;
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return true;
+    }
+    return false;
   }
 
   function initIframeCursor() {
@@ -189,6 +195,7 @@
     var raf = 0;
     var lastX = 0;
     var lastY = 0;
+    var shown = false;
 
     function paint() {
       raf = 0;
@@ -196,42 +203,34 @@
         'translate3d(' + lastX + 'px,' + lastY + 'px,0) translate3d(-50%,-50%,0)';
     }
 
-    // 用 pointermove 兼容易触屏/触控笔；只跟随鼠标类指针
-    document.addEventListener(
-      'pointermove',
-      function (ev) {
-        if (ev.pointerType && ev.pointerType !== 'mouse') {
-          layer.classList.remove('on');
-          return;
-        }
-        lastX = ev.clientX;
-        lastY = ev.clientY;
-        if (isOverCommentFrame(ev.target)) {
-          layer.classList.add('on');
-        } else {
-          layer.classList.remove('on');
-        }
-        if (!raf) raf = window.requestAnimationFrame(paint);
-      },
-      { passive: true }
-    );
+    function setShown(on) {
+      if (on === shown) return;
+      shown = on;
+      layer.classList.toggle('on', on);
+    }
 
-    // 指针离开文档 / 滚出评论区时收起覆盖层
-    document.addEventListener(
-      'pointerleave',
-      function () {
-        layer.classList.remove('on');
-      },
-      { passive: true }
-    );
+    function onMove(ev) {
+      if (ev.pointerType && ev.pointerType !== 'mouse') {
+        setShown(false);
+        return;
+      }
+      lastX = ev.clientX;
+      lastY = ev.clientY;
+      setShown(overCommentZone(lastX, lastY));
+      if (!raf) raf = window.requestAnimationFrame(paint);
+    }
 
-    window.addEventListener('blur', function () {
-      layer.classList.remove('on');
-    });
+    // 捕获阶段监听，iframe 内的命中也能收到（同一文档内）
+    document.addEventListener('pointermove', onMove, { passive: true, capture: true });
+    document.addEventListener('mousemove', onMove, { passive: true, capture: true });
 
-    document.addEventListener('pjax:success', function () {
-      layer.classList.remove('on');
-    });
+    // 指针离开文档 / 滚出评论区 / 失焦时收起
+    document.addEventListener('pointerleave', function () { setShown(false); }, { passive: true });
+    document.addEventListener('mouseleave', function () { setShown(false); }, { passive: true });
+    window.addEventListener('blur', function () { setShown(false); });
+    document.addEventListener('scroll', function () { setShown(false); }, { passive: true, capture: true });
+
+    document.addEventListener('pjax:success', function () { setShown(false); });
   }
 
   if (document.readyState === 'loading') {
