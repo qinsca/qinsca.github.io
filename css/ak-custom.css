@@ -462,7 +462,52 @@ html.ak-theme-changing * {
 }
 
 /* ------------------------------------------------------------------ */
-/* 7. 细节修补                                                         */
+/* 7. 评论区光标一致化                                                 */
+/* ------------------------------------------------------------------ */
+/* giscus / utterances 是跨域 iframe：父页面的 cursor 只能作用于
+   <iframe> 元素本身，进不到它内部的文档 —— 所以整站是自定义像素光标，
+   一划进评论区就变回系统箭头（浏览器安全限制，改不了 iframe 内部）。
+
+   这里改用"覆盖层"方案（配合 source/js/ak-custom.js）：
+   指针进入评论区时隐藏原生光标，在指针位置画同款像素光标。
+   覆盖层是 pointer-events: none，不会挡住 iframe 的点击与滚动。 */
+
+#giscus iframe,
+#utterances iframe,
+.giscus-frame,
+.utterances-frame {
+  cursor: none !important;
+}
+
+#ak-iframe-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 65539;
+  width: 14px;
+  height: 14px;
+  background-image: var(--cursor-data);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.55));
+  transition: opacity 0.15s;
+}
+
+#ak-iframe-cursor.on {
+  opacity: 1;
+}
+
+/* 夜间十字是白色，描边要反过来才看得清 */
+:root[theme-mode='dark'] #ak-iframe-cursor {
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.45));
+}
+
+/* ------------------------------------------------------------------ */
+/* 8. 细节修补                                                         */
 /* ------------------------------------------------------------------ */
 /* 灯箱包裹层：不要把图片挤成行内元素 */
 #post-content a.item-img {

@@ -143,8 +143,95 @@
   function start() {
     bind();
     refreshA11y();
+    initIframeCursor();
     // pjax 的 DOM 替换可能晚于 DOMContentLoaded
     window.setTimeout(refreshA11y, 600);
+    window.setTimeout(initIframeCursor, 600);
+  }
+
+  /* ==================================================================
+     评论区光标一致化
+     ------------------------------------------------------------------
+     giscus 是 giscus.app 的跨域 iframe，父页面的 cursor 规则进不到
+     它内部的文档，所以整站的像素光标一进评论区就失效。
+
+     由于无法穿透 iframe，改成覆盖层：指针在评论区上方时隐藏原生光标，
+     在指针位置画同款像素光标（样式见 ak-custom.css 第 7 节）。
+     ================================================================== */
+  var iframeCursor = null;
+
+  function ensureCursorLayer() {
+    if (iframeCursor && iframeCursor.isConnected) return iframeCursor;
+    iframeCursor = document.createElement('div');
+    iframeCursor.id = 'ak-iframe-cursor';
+    document.body.appendChild(iframeCursor);
+    return iframeCursor;
+  }
+
+  function isOverCommentFrame(el) {
+    if (!el) return false;
+    var frame = el.closest
+      ? el.closest('iframe, #giscus, #utterances')
+      : null;
+    if (!frame) return false;
+    return !!(
+      frame.closest('#giscus, #utterances, #comments') ||
+      frame.classList.contains('giscus-frame') ||
+      frame.classList.contains('utterances-frame')
+    );
+  }
+
+  function initIframeCursor() {
+    if (initIframeCursor.done) return;
+    initIframeCursor.done = true;
+
+    var layer = ensureCursorLayer();
+    var raf = 0;
+    var lastX = 0;
+    var lastY = 0;
+
+    function paint() {
+      raf = 0;
+      layer.style.transform =
+        'translate3d(' + lastX + 'px,' + lastY + 'px,0) translate3d(-50%,-50%,0)';
+    }
+
+    // 用 pointermove 兼容易触屏/触控笔；只跟随鼠标类指针
+    document.addEventListener(
+      'pointermove',
+      function (ev) {
+        if (ev.pointerType && ev.pointerType !== 'mouse') {
+          layer.classList.remove('on');
+          return;
+        }
+        lastX = ev.clientX;
+        lastY = ev.clientY;
+        if (isOverCommentFrame(ev.target)) {
+          layer.classList.add('on');
+        } else {
+          layer.classList.remove('on');
+        }
+        if (!raf) raf = window.requestAnimationFrame(paint);
+      },
+      { passive: true }
+    );
+
+    // 指针离开文档 / 滚出评论区时收起覆盖层
+    document.addEventListener(
+      'pointerleave',
+      function () {
+        layer.classList.remove('on');
+      },
+      { passive: true }
+    );
+
+    window.addEventListener('blur', function () {
+      layer.classList.remove('on');
+    });
+
+    document.addEventListener('pjax:success', function () {
+      layer.classList.remove('on');
+    });
   }
 
   if (document.readyState === 'loading') {
