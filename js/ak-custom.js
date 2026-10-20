@@ -261,6 +261,54 @@
     window.setTimeout(initCommentCursor, 600);
   }
 
+  /* ------------------------------------------------------------------
+     诊断入口：控制台执行 akCursorDiag() 会打印一份自检报告
+     （页面是否加载了新版 JS、覆盖层是否存在、评论区矩形、光标图变量解析情况）
+     ------------------------------------------------------------------ */
+  window.akCursorDiag = function () {
+    var layer = document.getElementById('ak-iframe-cursor');
+    var report = {
+      jsVersion: 'ak-cursor/4',
+      debugHash: CURSOR_DEBUG,
+      layerExists: !!layer,
+      layerClass: layer ? layer.className : null,
+      layerStyle: layer ? (layer.style.left + ',' + layer.style.top) : null,
+      layerRect: layer ? JSON.parse(JSON.stringify(layer.getBoundingClientRect())) : null,
+      computed: {}
+    };
+
+    if (layer) {
+      var cs = window.getComputedStyle(layer);
+      report.computed = {
+        position: cs.position,
+        zIndex: cs.zIndex,
+        visibility: cs.visibility,
+        opacity: cs.opacity,
+        backgroundImage: (cs.backgroundImage || '').slice(0, 80),
+        display: cs.display
+      };
+    }
+
+    report.containers = [];
+    var nodes = document.querySelectorAll(COMMENT_ZONE);
+    for (var i = 0; i < nodes.length; i++) {
+      var r = nodes[i].getBoundingClientRect();
+      report.containers.push({
+        sel: nodes[i].id || nodes[i].className || nodes[i].tagName,
+        w: Math.round(r.width),
+        h: Math.round(r.height),
+        top: Math.round(r.top),
+        hasHiddenClass: nodes[i].classList.contains('ak-cursor-hidden')
+      });
+    }
+
+    report.cursorData = window.getComputedStyle(document.documentElement)
+      .getPropertyValue('--cursor-data').slice(0, 40);
+
+    if (window.console) console.log('[akCursorDiag]', report);
+    return report;
+  };
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
   } else {
