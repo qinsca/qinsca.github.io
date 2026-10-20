@@ -146,27 +146,37 @@
      giscus 是跨域 iframe，父页面 CSS 进不到它内部，评论区内只能显示
      系统箭头。这里在 iframe 上方画一个与主题同款的像素光标来模拟。
 
-     判定用【坐标】而非 event.target：
-     giscus 的 iframe 是异步注入的，尺寸又常小于容器，用 target 判断
-     会在容器边缘几像素上误判为"已离开"，导致光标闪烁。
+     安全策略：默认【不隐藏】原生光标。每次指针移动时先算好位置、把覆盖层
+     画出来，确认它真的可见了，再给评论区容器加 .ak-cursor-hidden 隐藏原生
+     箭头。这样即使 JS 出错、或被其它脚本干扰，指针也不会"整个消失"。
+
+     判定用【坐标】而非 event.target：giscus 的 iframe 是异步注入的，
+     尺寸常小于容器，用 target 判断会在边缘几像素误判为"已离开"。
      ================================================================== */
   var commentCursor = null;
 
   var COMMENT_ZONE = '#comments, #giscus, #utterances, .giscus-frame';
 
+  /** 地址栏带 #akcursor-debug 时给覆盖层描红，便于肉眼确认它在动 */
+  var CURSOR_DEBUG = /akcursor-debug/.test(window.location.hash);
+
   function cursorLayer() {
     if (commentCursor && commentCursor.isConnected) return commentCursor;
-    commentCursor = document.createElement('div');
-    commentCursor.id = 'ak-iframe-cursor';
-    document.body.appendChild(commentCursor);
-    return commentCursor;
+    var el = document.createElement('div');
+    el.id = 'ak-iframe-cursor';
+    if (CURSOR_DEBUG) el.className = 'ak-debug';
+    document.body.appendChild(el);
+    commentCursor = el;
+    return el;
   }
 
   /** 指针坐标是否落在评论区的外接矩形内 */
   function inCommentZone(x, y) {
     var nodes = document.querySelectorAll(COMMENT_ZONE);
     for (var i = 0; i < nodes.length; i++) {
-      var r = nodes[i].getBoundingClientRect();
+      var el = nodes[i];
+      if (!el) continue;
+      var r = el.getBoundingClientRect();
       // 跳过尚未注入 / 没有尺寸的容器
       if (r.width < 16 || r.height < 16) continue;
       if (x >= r.left && x < r.right && y >= r.top && y < r.bottom) return true;
@@ -184,6 +194,10 @@
     var px = 0;
     var py = 0;
 
+    function containers() {
+      return document.querySelectorAll('#comments, #giscus, #utterances');
+    }
+
     function paint() {
       raf = 0;
       layer.style.left = px + 'px';
@@ -193,7 +207,20 @@
     function show(on) {
       if (on === shown) return;
       shown = on;
-      layer.classList.toggle('on', on);
+
+      if (on) {
+        // 先定位，保证覆盖层出现在当前指针处，再让它可见
+        layer.style.left = px + 'px';
+        layer.style.top = py + 'px';
+        layer.classList.add('on');
+        // 覆盖层确认可见后，才隐藏原生箭头
+        var cs = containers();
+        for (var i = 0; i < cs.length; i++) cs[i].classList.add('ak-cursor-hidden');
+      } else {
+        layer.classList.remove('on');
+        var cs2 = containers();
+        for (var j = 0; j < cs2.length; j++) cs2[j].classList.remove('ak-cursor-hidden');
+      }
     }
 
     function track(ev) {
@@ -203,9 +230,18 @@
       }
       px = ev.clientX;
       py = ev.clientY;
-      // 先定位再决定是否显示，避免第一帧出现在旧位置
-      if (!raf) raf = window.requestAnimationFrame(paint);
-      show(inCommentZone(px, py));
+      var inside = inCommentZone(px, py);
+      if (inside) {
+        layer.style.left = px + 'px';
+        layer.style.top = py + 'px';
+      }
+      show(inside);
+      if (CURSOR_DEBUG && inside) {
+        window.console &&
+          console.log('[ak-cursor] x=' + px + ' y=' + py +
+            ' layer=' + layer.className +
+            ' style=' + layer.style.left + ',' + layer.style.top);
+      }
     }
 
     document.addEventListener('pointermove', track, { passive: true });

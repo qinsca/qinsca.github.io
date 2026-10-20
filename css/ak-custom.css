@@ -479,9 +479,12 @@ html.ak-theme-changing * {
    开关：如需停用，在 _config.arknights.yml 的 stylesheets 里去掉本文件，
    或直接删掉本节 + ak-custom.js 里的 initCommentCursor()。 */
 
-#giscus,
-#utterances,
-#comments {
+/* 关键：默认【不】隐藏原生光标。只有 JS 确认覆盖层真的画出来了，
+   才给评论区加上 .ak-cursor-hidden —— 这样即使 JS 出错/没跑，
+   原生光标也依然在，绝不会出现"光标整个消失"的情况。 */
+#giscus.ak-cursor-hidden,
+#utterances.ak-cursor-hidden,
+#comments.ak-cursor-hidden {
   cursor: none;
 }
 
@@ -489,9 +492,12 @@ html.ak-theme-changing * {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 65539;
+  z-index: 2147483000; /* 高于主题光标圆环(65538)与灯箱(65537) */
   width: 16px;
   height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 0;
   /* 复用主题的光标图（白天深色块、夜间白色块），保持全站一致。
      注意 theme-mode 之外的根节点没有 --cursor-data，这里给一个兜底值。 */
   background-image: var(--cursor-data, var(--light-cursor));
@@ -499,13 +505,25 @@ html.ak-theme-changing * {
   background-repeat: no-repeat;
   image-rendering: pixelated;
   pointer-events: none; /* 绝不挡住点击/滚动 */
+  visibility: hidden;
   opacity: 0;
   transform: translate3d(-50%, -50%, 0);
   transition: opacity 0.12s;
 }
 
 #ak-iframe-cursor.on {
+  visibility: visible;
   opacity: 1;
+}
+
+/* 诊断模式：地址栏加 #akcursor-debug 后，覆盖层描红以便肉眼确认它是否在动 */
+#ak-iframe-cursor.ak-debug {
+  visibility: visible;
+  opacity: 0.85;
+  background-color: rgba(255, 0, 0, 0.55);
+  outline: 2px solid #f00;
+  width: 28px;
+  height: 28px;
 }
 
 /* ------------------------------------------------------------------ */
