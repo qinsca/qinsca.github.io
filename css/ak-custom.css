@@ -462,64 +462,6 @@ html.ak-theme-changing * {
 }
 
 /* ------------------------------------------------------------------ */
-/* 7. 评论区光标一致化                                                 */
-/* ------------------------------------------------------------------ */
-/* giscus / utterances 是跨域 iframe：父页面的 cursor 只能作用于
-   <iframe> 元素本身，进不到它内部的文档 —— 所以整站是自定义像素光标，
-   一划进评论区就变回系统箭头（浏览器安全限制，改不了 iframe 内部）。
-
-   这里改用"覆盖层"方案（配合 source/js/ak-custom.js）：
-   指针进入评论区时隐藏原生光标，在指针位置画同款像素光标。
-   覆盖层是 pointer-events: none，不会挡住 iframe 的点击与滚动。 */
-
-/* 隐藏原生光标的范围要与 JS 的判定范围一致（整个评论区，而不只是 iframe），
-   否则容器边缘那几像素会出现"原生箭头 ↔ 像素光标"来回跳。
-   #giscus 内的元素都用通配符，覆盖 giscus 自己注入的包裹 <div>。 */
-#giscus,
-#giscus *,
-#utterances,
-#utterances *,
-.giscus-frame,
-.utterances-frame {
-  cursor: none !important;
-}
-
-#ak-iframe-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 65539;
-  width: 15px;
-  height: 15px;
-
-  /* 十字准星：中心透明，四向 1px 细臂。
-     主题自带的 --cursor-data 是 6×6 的【实心方块】（中心 4×4 完全不透明），
-     拉到 14px 后放大成一块，看着就是个白点/黑块，所以这里单独画一个准星。
-     白天黑准星、夜间白准星，由下面两条 theme-mode 规则切换。 */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15'%3E%3Cpath d='M7.5 0v5.2M7.5 9.8V15M0 7.5h5.2M9.8 7.5H15' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  pointer-events: none;
-  opacity: 0;
-  transform: translate3d(-50%, -50%, 0);
-  /* 让准星压在白底/深色底上都看得见 */
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.9))
-    drop-shadow(0 0 0.5px rgba(0, 0, 0, 0.7));
-  transition: opacity 0.15s;
-}
-
-#ak-iframe-cursor.on {
-  opacity: 1;
-}
-
-/* 夜间背景深，准星换白色 */
-:root[theme-mode='dark'] #ak-iframe-cursor {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 15 15'%3E%3Cpath d='M7.5 0v5.2M7.5 9.8V15M0 7.5h5.2M9.8 7.5H15' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.9))
-    drop-shadow(0 0 0.5px rgba(255, 255, 255, 0.6));
-}
-
-/* ------------------------------------------------------------------ */
 /* 8. 细节修补                                                         */
 /* ------------------------------------------------------------------ */
 /* 灯箱包裹层：不要把图片挤成行内元素 */
