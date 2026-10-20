@@ -462,6 +462,53 @@ html.ak-theme-changing * {
 }
 
 /* ------------------------------------------------------------------ */
+/* 7. 评论区光标（覆盖层方案）                                          */
+/* ------------------------------------------------------------------ */
+/* giscus 是 giscus.app 的跨域 iframe，父页面 CSS 进不到它内部文档，
+   所以主题的像素光标一进评论区就变成系统箭头（浏览器同源策略，无解）。
+   主题那个跟随圆环 #cursor-outer 只是父页面的浮层，视觉上盖在 iframe 上，
+   并不能代表 iframe 里的真实指针。
+
+   这里用覆盖层模拟：指针进入评论区范围时
+     1) 对评论区元素本身设 cursor: none（隐藏原生箭头）
+     2) 在指针位置画一张主题同款像素光标（#ak-iframe-cursor）
+
+   注意：判断范围与隐藏范围必须一致（都是"评论区块的外接矩形"），
+   否则容器边缘会出现"原生箭头 ↔ 假光标"来回闪。
+
+   开关：如需停用，在 _config.arknights.yml 的 stylesheets 里去掉本文件，
+   或直接删掉本节 + ak-custom.js 里的 initCommentCursor()。 */
+
+#giscus,
+#utterances,
+#comments {
+  cursor: none;
+}
+
+#ak-iframe-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 65539;
+  width: 16px;
+  height: 16px;
+  /* 复用主题的光标图（白天深色块、夜间白色块），保持全站一致。
+     注意 theme-mode 之外的根节点没有 --cursor-data，这里给一个兜底值。 */
+  background-image: var(--cursor-data, var(--light-cursor));
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none; /* 绝不挡住点击/滚动 */
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0);
+  transition: opacity 0.12s;
+}
+
+#ak-iframe-cursor.on {
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ */
 /* 8. 细节修补                                                         */
 /* ------------------------------------------------------------------ */
 /* 灯箱包裹层：不要把图片挤成行内元素 */

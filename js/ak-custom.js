@@ -140,11 +140,89 @@
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['theme-mode'] });
   }
 
+  /* ==================================================================
+     评论区光标（覆盖层）
+     ------------------------------------------------------------------
+     giscus 是跨域 iframe，父页面 CSS 进不到它内部，评论区内只能显示
+     系统箭头。这里在 iframe 上方画一个与主题同款的像素光标来模拟。
+
+     判定用【坐标】而非 event.target：
+     giscus 的 iframe 是异步注入的，尺寸又常小于容器，用 target 判断
+     会在容器边缘几像素上误判为"已离开"，导致光标闪烁。
+     ================================================================== */
+  var commentCursor = null;
+
+  var COMMENT_ZONE = '#comments, #giscus, #utterances, .giscus-frame';
+
+  function cursorLayer() {
+    if (commentCursor && commentCursor.isConnected) return commentCursor;
+    commentCursor = document.createElement('div');
+    commentCursor.id = 'ak-iframe-cursor';
+    document.body.appendChild(commentCursor);
+    return commentCursor;
+  }
+
+  /** 指针坐标是否落在评论区的外接矩形内 */
+  function inCommentZone(x, y) {
+    var nodes = document.querySelectorAll(COMMENT_ZONE);
+    for (var i = 0; i < nodes.length; i++) {
+      var r = nodes[i].getBoundingClientRect();
+      // 跳过尚未注入 / 没有尺寸的容器
+      if (r.width < 16 || r.height < 16) continue;
+      if (x >= r.left && x < r.right && y >= r.top && y < r.bottom) return true;
+    }
+    return false;
+  }
+
+  function initCommentCursor() {
+    if (initCommentCursor.done) return;
+    initCommentCursor.done = true;
+
+    var layer = cursorLayer();
+    var shown = false;
+    var raf = 0;
+    var px = 0;
+    var py = 0;
+
+    function paint() {
+      raf = 0;
+      layer.style.left = px + 'px';
+      layer.style.top = py + 'px';
+    }
+
+    function show(on) {
+      if (on === shown) return;
+      shown = on;
+      layer.classList.toggle('on', on);
+    }
+
+    function track(ev) {
+      if (ev.pointerType && ev.pointerType !== 'mouse') {
+        show(false);
+        return;
+      }
+      px = ev.clientX;
+      py = ev.clientY;
+      // 先定位再决定是否显示，避免第一帧出现在旧位置
+      if (!raf) raf = window.requestAnimationFrame(paint);
+      show(inCommentZone(px, py));
+    }
+
+    document.addEventListener('pointermove', track, { passive: true });
+    document.addEventListener('mousemove', track, { passive: true });
+    document.addEventListener('pointerleave', function () { show(false); }, { passive: true });
+    window.addEventListener('blur', function () { show(false); });
+    document.addEventListener('scroll', function () { show(false); }, { passive: true, capture: true });
+    document.addEventListener('pjax:success', function () { show(false); });
+  }
+
   function start() {
     bind();
     refreshA11y();
+    initCommentCursor();
     // pjax 的 DOM 替换可能晚于 DOMContentLoaded
     window.setTimeout(refreshA11y, 600);
+    window.setTimeout(initCommentCursor, 600);
   }
 
   if (document.readyState === 'loading') {
