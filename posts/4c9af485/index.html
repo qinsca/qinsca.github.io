@@ -52,7 +52,7 @@ function updatePageConfig() {
   }
 }
 document.addEventListener('pjax:complete', function() { updatePageConfig(); });
-updatePageConfig();</script><link type="text/css" rel="stylesheet" href="/lib/encrypt/hbe.style.css"><script src="//unpkg.com/mermaid@11.12.2/dist/mermaid.min.js"></script><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lightgallery.css"><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lg-zoom.css"><link type="text/css" rel="stylesheet" href="//unpkg.com/lightgallery@2.7.1/css/lg-thumbnail.css"><link type="text/css" rel="stylesheet" href="/lib/fontawesome/css/all.min.css"><style defer src="/css/ak-custom.css"></style><link rel="stylesheet" href="/css/ak-custom.css"><script>if (window.localStorage.getItem('theme-mode') === 'light' || window.matchMedia('(prefers-color-scheme:light)').matches)
+updatePageConfig();</script><link type="text/css" rel="stylesheet" href="/lib/encrypt/hbe.style.css"><link type="text/css" rel="stylesheet"  href="//unpkg.com/lightgallery@2.7.1/css/lightgallery.css" media="print" onload="this.media='all'"><link type="text/css" rel="stylesheet"  href="//unpkg.com/lightgallery@2.7.1/css/lg-zoom.css" media="print" onload="this.media='all'"><link type="text/css" rel="stylesheet"  href="//unpkg.com/lightgallery@2.7.1/css/lg-thumbnail.css" media="print" onload="this.media='all'"><link type="text/css" rel="stylesheet" href="/lib/fontawesome/css/all.min.css"><style defer src="/css/ak-custom.css"></style><link rel="stylesheet" href="/css/ak-custom.css"><script>if (window.localStorage.getItem('theme-mode') === 'light' || window.matchMedia('(prefers-color-scheme:light)').matches)
  document.documentElement.setAttribute('theme-mode', 'light')
 if (window.localStorage.getItem('theme-mode') === 'dark' || window.matchMedia('(prefers-color-scheme:dark)').matches)
  document.documentElement.setAttribute('theme-mode', 'dark')</script><style>@font-face {
@@ -66,10 +66,10 @@ if (window.localStorage.getItem('theme-mode') === 'dark' || window.matchMedia('(
  --dark-background: url('/img/bg.jpg');
  --light-background: url('/img/bk.jpg');
  --theme-encrypt-confirm: '确认'
-}</style><script defer src="/js/arknights.js"></script><script defer src="/js/search.js"></script><script defer src="https://vercount.one/js"></script><script defer type="module">import mermaid from '//unpkg.com/mermaid@11.12.2/dist/mermaid.esm.min.mjs';
+}</style><script defer src="/js/arknights.js"></script><script defer src="/js/search.js"></script><script defer type="module">import mermaid from '//unpkg.com/mermaid@11.12.2/dist/mermaid.esm.min.mjs';
 window.mermaid = mermaid;
 code.paintMermaid();
-</script><script async src="//unpkg.com/lightgallery@2.7.1/lightgallery.min.js"></script><script async src="//unpkg.com/lightgallery@2.7.1/plugins/zoom/lg-zoom.min.js"></script><script async src="//unpkg.com/lightgallery@2.7.1/plugins/thumbnail/lg-thumbnail.min.js"></script><script async src="/lib/encrypt/hbe.js"></script><script async src="/js/pjax.js"></script><script class="pjax-js">reset= () => {document.querySelector('.lg-container')?.remove()
+</script><script async src="/lib/encrypt/hbe.js"></script><script async src="/js/pjax.js"></script><script class="pjax-js">reset= () => {document.querySelector('.lg-container')?.remove()
 lightGallery(document.getElementById('post-bg'), {
   plugins: [lgZoom,lgThumbnail],
   selector: '.item-img'})}</script><script>window.addEventListener("load",() => {pjax = new Pjax({
@@ -207,4 +207,93 @@ flag_bytes = long_to_bytes(n_flag)<br></code></pre></td></tr></table></figure>
 <h2 id="Web"><a href="#Web" class="headerlink" title="Web"></a>Web</h2><h3 id="Druid"><a href="#Druid" class="headerlink" title="Druid"></a>Druid</h3><p>根据提示&#x2F;Druid<br>随便试账号和密码，admin admin过了</p>
 <h3 id="EZ-login"><a href="#EZ-login" class="headerlink" title="EZ_login"></a>EZ_login</h3><p>根据提示加X-Forward伪造本地管理员<br>然后burpsuit爆破得到密码simple</p>
 <h3 id="EZ-SQL"><a href="#EZ-SQL" class="headerlink" title="EZ_SQL"></a>EZ_SQL</h3><p>查询返回几列数据 1’ ORDER BY 3 – 成功 4 失败<br>联合查询<br>1’ UNION SELECT 1,2,3 –<br>CONVERT把第一个flag变成 flag USING utf8<br>1’ UNION SELECT 1,CONVERT(flag USING utf8), 3 FROM flag – </p>
-<div id="paginator"></div></div><div id="post-footer"><div id="pages" style="justify-content: flex-start"><div class="footer-link" style="width: 50%;text-align:right;border-right:1px #fe2 solid"><a href="/posts/4a17b156/">← 下一篇 Hello World</a></div></div></div><div id="comments"><div id="giscus"></div></div></div><div class="bottom-btn"><div><a class="i-top" id="to-top" onClick="scrolls.scrolltop();" title="回到顶部" style="opacity: 0; display: none;">∧ </a><a class="i-index" id="to-index" onClick="tocControl.change()" title="文章目录"><span class="tocBtnIconBar"></span><span class="tocBtnIconBar"></span><span class="tocBtnIconBar"></span></a><a class="i-color" id="color-mode" onClick="colorMode.change()" title="切换主题"></a></div></div></article><aside><div id="about"><a href="/" id="logo"><img src="/images/qsc-avatar.png" alt="qsc" style="margin:6px;border-radius:50%;"></a><h1 id="Dr"><a href="/about/">qsc</a></h1><div id="description"><p>记录学习日常</p></div><div id="social-links"><a class="social" target="_blank" rel="noopener" href="https://github.com/qinsca"><i class="fab fa-github" alt="GitHub"></i></a><a class="social" href="mailto:1744326850@qq.com"><i class="fa fa-envelope" alt="E-Mail"></i></a></div></div><div id="aside-block"><div id="toc-div"><h1>目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AI"><span class="toc-number">1.</span> <span class="toc-text">AI:</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Coup"><span class="toc-number">1.1.</span> <span class="toc-text">Coup</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ThreeFairy-Tales"><span class="toc-number">1.2.</span> <span class="toc-text">ThreeFairy Tales</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crypto%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">Crypto：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cantor%E2%80%99s-gift"><span class="toc-number">2.1.</span> <span class="toc-text">Cantor’s_gift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sign-in"><span class="toc-number">2.2.</span> <span class="toc-text">sign_in</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#p-q"><span class="toc-number">2.3.</span> <span class="toc-text">p&#x3D;~q</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8E%E7%8B%90%E7%A6%85"><span class="toc-number">2.4.</span> <span class="toc-text">野狐禅</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#misc"><span class="toc-number">3.</span> <span class="toc-text">misc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BadFile"><span class="toc-number">3.1.</span> <span class="toc-text">BadFile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Meow"><span class="toc-number">3.2.</span> <span class="toc-text">Meow</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A2%E6%A3%AE%E5%A0%A1%E7%9A%84%E7%A7%98%E5%AF%86"><span class="toc-number">3.3.</span> <span class="toc-text">卢森堡的秘密</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pwn"><span class="toc-number">4.</span> <span class="toc-text">Pwn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ret"><span class="toc-number">4.1.</span> <span class="toc-text">Ret</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Web"><span class="toc-number">5.</span> <span class="toc-text">Web</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Druid"><span class="toc-number">5.1.</span> <span class="toc-text">Druid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EZ-login"><span class="toc-number">5.2.</span> <span class="toc-text">EZ_login</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EZ-SQL"><span class="toc-number">5.3.</span> <span class="toc-text">EZ_SQL</span></a></li></ol></li></ol></div></div><footer><nobr>构建自 <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></nobr></footer></aside></main><canvas id="canvas-dust"></canvas><script defer src="/js/ak-custom.js"></script></body></html>
+<div id="paginator"></div></div><div id="post-footer"><div id="pages" style="justify-content: flex-start"><div class="footer-link" style="width: 50%;text-align:right;border-right:1px #fe2 solid"><a href="/posts/4a17b156/">← 下一篇 Hello World</a></div></div></div><div id="comments"><div id="giscus"></div></div></div><div class="bottom-btn"><div><a class="i-top" id="to-top" onClick="scrolls.scrolltop();" title="回到顶部" style="opacity: 0; display: none;">∧ </a><a class="i-index" id="to-index" onClick="tocControl.change()" title="文章目录"><span class="tocBtnIconBar"></span><span class="tocBtnIconBar"></span><span class="tocBtnIconBar"></span></a><a class="i-color" id="color-mode" onClick="colorMode.change()" title="切换主题"></a></div></div></article><aside><div id="about"><a href="/" id="logo"><img src="/images/qsc-avatar.png" alt="qsc" style="margin:6px;border-radius:50%;"></a><h1 id="Dr"><a href="/about/">qsc</a></h1><div id="description"><p>记录学习日常</p></div><div id="social-links"><a class="social" target="_blank" rel="noopener" href="https://github.com/qinsca"><i class="fab fa-github" alt="GitHub"></i></a><a class="social" href="mailto:1744326850@qq.com"><i class="fa fa-envelope" alt="E-Mail"></i></a></div></div><div id="aside-block"><div id="toc-div"><h1>目录</h1><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#AI"><span class="toc-number">1.</span> <span class="toc-text">AI:</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Coup"><span class="toc-number">1.1.</span> <span class="toc-text">Coup</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ThreeFairy-Tales"><span class="toc-number">1.2.</span> <span class="toc-text">ThreeFairy Tales</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Crypto%EF%BC%9A"><span class="toc-number">2.</span> <span class="toc-text">Crypto：</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Cantor%E2%80%99s-gift"><span class="toc-number">2.1.</span> <span class="toc-text">Cantor’s_gift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#sign-in"><span class="toc-number">2.2.</span> <span class="toc-text">sign_in</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#p-q"><span class="toc-number">2.3.</span> <span class="toc-text">p&#x3D;~q</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8E%E7%8B%90%E7%A6%85"><span class="toc-number">2.4.</span> <span class="toc-text">野狐禅</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#misc"><span class="toc-number">3.</span> <span class="toc-text">misc</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#BadFile"><span class="toc-number">3.1.</span> <span class="toc-text">BadFile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Meow"><span class="toc-number">3.2.</span> <span class="toc-text">Meow</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%A2%E6%A3%AE%E5%A0%A1%E7%9A%84%E7%A7%98%E5%AF%86"><span class="toc-number">3.3.</span> <span class="toc-text">卢森堡的秘密</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pwn"><span class="toc-number">4.</span> <span class="toc-text">Pwn</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ret"><span class="toc-number">4.1.</span> <span class="toc-text">Ret</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Web"><span class="toc-number">5.</span> <span class="toc-text">Web</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Druid"><span class="toc-number">5.1.</span> <span class="toc-text">Druid</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EZ-login"><span class="toc-number">5.2.</span> <span class="toc-text">EZ_login</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EZ-SQL"><span class="toc-number">5.3.</span> <span class="toc-text">EZ_SQL</span></a></li></ol></li></ol></div></div><footer><nobr>构建自 <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></nobr></footer></aside></main><canvas id="canvas-dust"></canvas><script defer src="/js/ak-custom.js"></script><script id="ak-dynamic-scripts">
+(function () {
+  /* 占位函数：主题的 reset() 直接引用 lightGallery / lgZoom / lgThumbnail
+     这几个全局变量（见 layout/includes/js-data.pug:150）。脚本还没到达时
+     引用会抛 ReferenceError，先放空函数占位，避免打断 pjax 初始化。
+     真正的脚本加载后会覆盖掉它们。 */
+  if (typeof window.lightGallery === 'undefined') window.lightGallery = function () {};
+  if (typeof window.lgZoom === 'undefined') window.lgZoom = function () {};
+  if (typeof window.lgThumbnail === 'undefined') window.lgThumbnail = function () {};
+
+  function load(src, next) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.onload = s.onerror = function () { if (next) next(); };
+    document.head.appendChild(s);
+  }
+
+  function chain(list, done) {
+    var i = 0;
+    (function step() {
+      if (i >= list.length) return done && done();
+      load(list[i++], step);
+    })();
+  }
+
+  // 访问量统计：独立加载，失败就交给 ak-vercount-fallback 收起占位
+  load('https://vercount.one/js');
+
+  // 图表：主题原本在 head 里同步加载，会阻塞整页解析；改成动态后即使
+  // unpkg 不可达，也只会让图表不渲染，不影响页面其他部分。
+  load('https://unpkg.com/mermaid@11.12.2/dist/mermaid.min.js');
+
+  // 图片灯箱：按顺序加载，全部到位后重新初始化一次
+  chain([
+    'https://unpkg.com/lightgallery@2.7.1/lightgallery.min.js',
+    'https://unpkg.com/lightgallery@2.7.1/plugins/zoom/lg-zoom.min.js',
+    'https://unpkg.com/lightgallery@2.7.1/plugins/thumbnail/lg-thumbnail.min.js'
+  ], function () {
+    // 真实脚本已就位，重新跑一次 reset() 让正文图片可以点击放大
+    try {
+      if (typeof window.reset === 'function') window.reset();
+    } catch (e) {}
+  });
+})();
+</script>
+<script id="ak-vercount-fallback">
+(function () {
+  var LOADING = /加载中|loading/i;
+  var TIMEOUT = 8000;
+
+  function hideStale() {
+    // 所有 vercount 的数值节点 id 都是 vercount_value_*
+    var nodes = document.querySelectorAll('[id^="vercount_value_"]');
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!LOADING.test(el.textContent || '')) continue;
+
+      // 侧边栏：两个数值包在同一个 #total-view 里，整块收起
+      var box = el.closest('#total-view');
+      // 文章页：单个 "页面浏览: x" 的容器
+      if (!box) box = el.closest('[id^="vercount_container_"]');
+      if (!box) box = el.parentElement;
+      if (box) box.style.display = 'none';
+    }
+
+    // 侧边栏那条 <br> 也会留下空隙，一并处理
+    var view = document.querySelector('#total-view');
+    if (view && view.style.display === 'none') {
+      var prev = view.previousElementSibling;
+      if (prev && prev.tagName === 'BR') prev.style.display = 'none';
+    }
+  }
+
+  // 等外部脚本有机会执行完再看
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(hideStale, TIMEOUT);
+    });
+  } else {
+    setTimeout(hideStale, TIMEOUT);
+  }
+
+  // pjax 换页后主题会重新插入 vercount 脚本，这里也重新计时
+  document.addEventListener('pjax:success', function () {
+    setTimeout(hideStale, TIMEOUT);
+  });
+})();
+</script>
+</body></html>
